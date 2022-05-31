@@ -1,4 +1,4 @@
-# Master_Thesis
+# Master_Thesis_Code
 This repository contains scripts for my Master Thesis.
 
 Title: Comparison of aerial images taken with drones and aircrafts and their evaluation possibilities for forestry practice
