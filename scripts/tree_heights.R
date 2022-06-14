@@ -51,15 +51,48 @@ ndsm_neukirchen9_tile1 <- terra::rast(paste0(filepath_neukirchen9_ndsm_aircraft,
 ndsm_neukirchen9_tile2 <- terra::rast(paste0(filepath_neukirchen9_ndsm_aircraft,
                                              "ndsm_325235639.tif"))
 
+
+ndsm_neukirchen9_tile1_rast <- raster::raster(paste0(filepath_neukirchen9_ndsm_aircraft,
+                                             "ndsm_325225639.tif"))
+
+ndsm_neukirchen9_tile2_rast <- raster::raster(paste0(filepath_neukirchen9_ndsm_aircraft,
+                                             "ndsm_325235639.tif"))
+
 # Drone --> currently still DSM, has to be changed to nDSM!!! #
-dsm_drone_reinhardshagen_1 <- terra::rast("J:/data/drone/reinhardshagen_e_str1_bis_4/DSM/Reinhardshagen_550_A_2_DEM10.tif")
-dsm_drone_reinhardshagen_2 <- terra::rast("J:/data/drone/reinhardshagen_e_str1_bis_4/DSM/Reinhardshagen_560_A_4_DEM10.tif")
+dsm_drone_reinhardshagen_1 <- terra::rast("J:/Drohne/nwe_flaechen_hartwich/daten/Neukirchen/521_C_1/Agisoft/Neukirchen_521_C_1_DEM10.tif")
+dsm_drone_reinhardshagen_2 <- terra::rast("J:/data/drone/reinhardshagen_e_str1_bis_4/DSM/Reinhardshagen_560_A_4_bDOM10_neu.tif")
 
-dsm_drone_neukirchen8_1 <- terra::rast("J:/data/drone/neukirchen_e_str8/DSM/Neukirchen_1071_B_1_DEM10.tif")
-dsm_drone_neukirchen8_2 <- terra::rast("J:/data/drone/neukirchen_e_str8/DSM/Neukirchen_1213_C_1_DEM10.tif")
+dsm_drone_neukirchen8_1 <- terra::rast("J:/data/drone/neukirchen_e_str8/DSM/Neukirchen_1071_B_1_bDOM10_neu.tif")
+dsm_drone_neukirchen8_2 <- terra::rast("J:/data/drone/neukirchen_e_str8/DSM/Neukirchen_1213_C_1_bDOM10_neu.tif")
 
-dsm_drone_neukirchen9_1 <- terra::rast("J:/data/drone/neukirchen_e_str9/DSM/Neukirchen_521_C_1_DEM10.tif")
-dsm_drone_neukirchen9_2 <- terra::rast("J:/data/drone/neukirchen_e_str9/DSM/Neukirchen_525_B_1_DEM10.tif")
+dsm_drone_neukirchen9_1 <- terra::rast("J:/Drohne/nwe_flaechen_hartwich/daten/Neukirchen/521_C_1/Agisoft/Neukirchen_521_C_1_DEM10.tif")
+dsm_drone_neukirchen9_2 <- terra::rast("J:/data/drone/neukirchen_e_str9/DSM/Neukirchen_525_B_1_bDOM10_neu.tif")
+
+
+ndsm_drone_neukirchen8_1_1 <- terra::rast(paste0(filepath_neukirchen8_ndsm_drone,
+                                                 "ndsm_325255644.tif"))
+
+ndsm_drone_neukirchen8_1_2 <- terra::rast(paste0(filepath_neukirchen8_ndsm_drone,
+                                                 "ndsm_325255645.tif"))
+
+ndsm_drone_neukirchen8_2_1 <- terra::rast(paste0(filepath_neukirchen8_ndsm_drone,
+                                                 "ndsm_325275644.tif"))
+
+ndsm_drone_neukirchen8_2_2 <- terra::rast(paste0(filepath_neukirchen8_ndsm_drone,
+                                                 "ndsm_325275645.tif"))
+
+ndsm_drone_neukirchen9_1 <- terra::rast(paste0(filepath_neukirchen9_ndsm_drone,
+                                               "ndsm_325225639.tif"))
+
+ndsm_drone_neukirchen9_1_rast <- raster::raster(paste0(filepath_neukirchen9_ndsm_drone,
+                                                       "ndsm_325225639.tif"))
+
+ndsm_drone_neukirchen9_2_1 <- terra::rast(paste0(filepath_neukirchen9_ndsm_drone,
+                                               "ndsm_325235639_1.tif"))
+
+ndsm_drone_neukirchen9_2_2 <- terra::rast(paste0(filepath_neukirchen9_ndsm_drone,
+                                                 "ndsm_325235639_2.tif"))
+
 
 
 # Data preprocessing
@@ -80,6 +113,21 @@ ndsm_aircraft_neukirchen8_2_merged <- terra::merge(ndsm_neukirchen8_tile3,
 ndsm_aircraft_neukirchen9_merged <- terra::merge(ndsm_neukirchen9_tile1,
                                                  ndsm_neukirchen9_tile2)
 
+ndsm_aircraft_neukirchen9_merged_rast <- raster::merge(ndsm_neukirchen9_tile1_rast,
+                                                 ndsm_neukirchen9_tile2_rast)
+
+# Drone #
+
+# Merge parts (nDSMs) at one location into one (where its necessary)
+ndsm_drone_neukirchen8_1 <- terra::merge(ndsm_drone_neukirchen8_1_1,
+                                         ndsm_drone_neukirchen8_1_2)
+
+ndsm_drone_neukirchen8_2 <- terra::merge(ndsm_drone_neukirchen8_2_1,
+                                         ndsm_drone_neukirchen8_2_2)
+
+ndsm_drone_neukirchen9_2 <- terra::merge(ndsm_drone_neukirchen9_2_1,
+                                         ndsm_drone_neukirchen9_2_2)
+
 # Crop out subsets of the merged aircraft nDSMs
 # corresponding to the extent of the respective drone nDSMs
 
@@ -87,40 +135,11 @@ ndsm_aircraft_neukirchen9_merged <- terra::merge(ndsm_neukirchen9_tile1,
 raster::compareCRS(ndsm_aircraft_reinhardshagen_merged, dsm_drone_reinhardshagen_1)
 raster::compareCRS(ndsm_aircraft_reinhardshagen_merged, dsm_drone_reinhardshagen_2)
 
-raster::compareCRS(ndsm_aircraft_neukirchen8_1_merged, dsm_drone_neukirchen8_1)
-raster::compareCRS(ndsm_aircraft_neukirchen8_2_merged, dsm_drone_neukirchen8_2)
+raster::compareCRS(ndsm_aircraft_neukirchen8_1_merged, ndsm_drone_neukirchen8_1)
+raster::compareCRS(ndsm_aircraft_neukirchen8_2_merged, ndsm_drone_neukirchen8_2)
 
-raster::compareCRS(ndsm_aircraft_neukirchen9_merged, dsm_drone_neukirchen9_1)
-raster::compareCRS(ndsm_aircraft_neukirchen9_merged, dsm_drone_neukirchen9_2)
-
-# Get extent of drone nDSMs
-terra::ext(dsm_drone_reinhardshagen_1)
-terra::ext(dsm_drone_reinhardshagen_2)
-
-terra::ext(dsm_drone_neukirchen8_1)
-terra::ext(dsm_drone_neukirchen8_2)
-
-terra::ext(dsm_drone_neukirchen9_1)
-terra::ext(dsm_drone_neukirchen9_2)
-
-# Define this extent new (UTM zone-number 32 has to be removed)
-terra::ext(dsm_drone_reinhardshagen_1) <- terra::ext(541261.1117562, 542399.480701,
-                                                     5698193.6553981, 5698869.39952059)
-
-terra::ext(dsm_drone_reinhardshagen_2) <- terra::ext(541258.7071286, 541461.8301163,
-                                                     5698996.4575736, 5699284.04853613)
-
-terra::ext(dsm_drone_neukirchen8_1) <- terra::ext(527660.8964696, 527827.3314433,
-                                                  5644953.32855214, 5645106.86856389)
-
-terra::ext(dsm_drone_neukirchen8_2) <- terra::ext(525125.9142932, 525547.7488196,
-                                                  5644903.61658953, 5645566.05673327)
-
-terra::ext(dsm_drone_neukirchen9_1) <- terra::ext(522260.5142122, 522545.7018505,
-                                                  5639230.99173351, 5639473.19630677)
-
-terra::ext(dsm_drone_neukirchen9_2) <- terra::ext(522746.2034559, 523065.677675,
-                                                  5639684.5060757, 5639935.40729279)
+raster::compareCRS(ndsm_aircraft_neukirchen9_merged, ndsm_drone_neukirchen9_1)
+raster::compareCRS(ndsm_aircraft_neukirchen9_merged, ndsm_drone_neukirchen9_2)
 
 # Crop out subsets
 ndsm_aircraft_reinhardshagen_1 <- terra::crop(ndsm_aircraft_reinhardshagen_merged,
@@ -130,29 +149,48 @@ ndsm_aircraft_reinhardshagen_2 <- terra::crop(ndsm_aircraft_reinhardshagen_merge
                                               dsm_drone_reinhardshagen_2)
 
 ndsm_aircraft_neukirchen8_1 <- terra::crop(ndsm_aircraft_neukirchen8_1_merged,
-                                           dsm_drone_neukirchen8_2)
+                                           ndsm_drone_neukirchen8_1)
 
 ndsm_aircraft_neukirchen8_2 <- terra::crop(ndsm_aircraft_neukirchen8_2_merged,
-                                           dsm_drone_neukirchen8_1)
+                                           ndsm_drone_neukirchen8_2)
 
 ndsm_aircraft_neukirchen9_1 <- terra::crop(ndsm_aircraft_neukirchen9_merged,
-                                           dsm_drone_neukirchen9_1)
+                                           ndsm_drone_neukirchen9_1)
+
+ndsm_aircraft_neukirchen9_1_rast <- raster::crop(ndsm_aircraft_neukirchen9_merged_rast,
+                                           ndsm_drone_neukirchen9_1_rast)
 
 ndsm_aircraft_neukirchen9_2 <- terra::crop(ndsm_aircraft_neukirchen9_merged,
-                                           dsm_drone_neukirchen9_2)
+                                           ndsm_drone_neukirchen9_2)
+
+# Resample drone rasters to the structure of the cropped aircraft rasters
+# --> necessary for direct comparisons between them (calculations)
+ndsm_drone_neukirchen8_1_resampled <- terra::resample(ndsm_drone_neukirchen8_1,
+                                                      ndsm_aircraft_neukirchen8_1)
+
+ndsm_drone_neukirchen8_2_resampled <- terra::resample(ndsm_drone_neukirchen8_2,
+                                                      ndsm_aircraft_neukirchen8_2)
+
+ndsm_drone_neukirchen9_1_resampled <- terra::resample(ndsm_drone_neukirchen9_1,
+                                                      ndsm_aircraft_neukirchen9_1)
+
+ndsm_drone_neukirchen9_2_resampled <- terra::resample(ndsm_drone_neukirchen9_2,
+                                                      ndsm_aircraft_neukirchen9_2)
 
 
+# Replace negative values by zero in drone nDSMs
+# (already done for aircraft nDSMs in external script)
+ndsm_drone_neukirchen8_1[ndsm_drone_neukirchen8_1 < 0] <- 0
+ndsm_drone_neukirchen8_1_resampled[ndsm_drone_neukirchen8_1_resampled < 0] <- 0
 
+ndsm_drone_neukirchen8_2[ndsm_drone_neukirchen8_2 < 0] <- 0
+ndsm_drone_neukirchen8_2_resampled[ndsm_drone_neukirchen8_2_resampled < 0] <- 0
 
+ndsm_drone_neukirchen9_1[ndsm_drone_neukirchen9_1 < 0] <- 0
+ndsm_drone_neukirchen9_1_resampled[ndsm_drone_neukirchen9_1_resampled < 0] <- 0
 
-
-
-
-
-
-
-
-
+ndsm_drone_neukirchen9_2[ndsm_drone_neukirchen9_2 < 0] <- 0
+ndsm_drone_neukirchen9_2_resampled[ndsm_drone_neukirchen9_2_resampled < 0] <- 0
 
 
 
@@ -162,15 +200,23 @@ ndsm_aircraft_neukirchen9_2 <- terra::crop(ndsm_aircraft_neukirchen9_merged,
 
 # Parallel Plots of aircraft and drone nDSMs
 par_org <- par()
+par(mfrow = c(1,3))
+terra::plot(ndsm_drone_neukirchen8_1)
+terra::plot(ndsm_drone_neukirchen8_1_resampled)
+terra::plot(ndsm_aircraft_neukirchen8_1)
+par(par_org)
+
+par_org <- par()
 par(mfrow = c(1,2))
-terra::plot(ndsm_aircraft_neukirchen9_2)
-terra::plot(dsm_drone_neukirchen9_2)
+raster::plot(test)
+raster::plot(ndsm_aircraft_neukirchen9_1_rast)
 par(par_org)
 
 
+test <- ndsm_aircraft_neukirchen9_1 - resampled_drone_rast
 
+test1 <- ndsm_aircraft_neukirchen9_1_rast - resampled_drone_rast
 
-
-
+terra::plot(ndsm_drone_neukirchen8_1)
 
 
