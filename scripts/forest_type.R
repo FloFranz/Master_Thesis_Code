@@ -3,7 +3,10 @@
 # Author:       Florian Franz
 # Description:  script calculates canopy cover and derives areas
 #               of open, dense forest and gaps for three different locations:
-#               Reinhardshagen, Neukirchen_8 and Neukirchen_9
+#               Reinhardshagen, Neukirchen_8 and Neukirchen_9,
+#               workflow is similar to the method used in the 'F3 project'
+#               (by FVA and NW-FVA) to derive forest structural parameters
+#               (https://www.waldwissen.net/de/technik-und-planung/waldinventur/ableitung-von-waldtyp)
 # Data          nDSM tif files from platforms 
 #               aircraft (0.5 m resolution) and drone (0.1 m resolution)
 #-------------------------------------------------------------------------------
@@ -40,9 +43,7 @@ matr <- c(0, 3, 0,
 
 rclmatr <- matrix(matr, ncol = 3, byrow = TRUE)
 
-
-##############
-# Improved workflow (focal part yet not implemented)
+# Improved workflow (focal part yet not fully implemented)
 ndsms_list <- list(ndsm_drone_reinhardshagen_1, ndsm_drone_reinhardshagen_1_resampled, ndsm_aircraft_reinhardshagen_1,
                    ndsm_drone_reinhardshagen_2, ndsm_drone_reinhardshagen_2_resampled, ndsm_aircraft_reinhardshagen_2,
                    ndsm_drone_neukirchen8_1, ndsm_drone_neukirchen8_1_resampled, ndsm_aircraft_neukirchen8_1,
@@ -56,173 +57,114 @@ ndsms_rcl_list <- lapply(ndsms_list, FUN = function(x) terra::classify(x, rclmat
 # Calculate focal mean:
 # Circular moving window with radius = 25 m
 
-#ndsms_focal_list <- lapply(test_list, FUN = function(x) terra::focal(x, w = ndsms_mov_wind_list, fun = "mean", na.policy = "omit"))
+# For testing with a smaller list
+#ndsms_rcl_list_test <- ndsms_rcl_list[c(17,18)]
 
-ndsm_drone_reinhardshagen_1_mov_wind <- terra::focalMat(ndsms_rcl_list[[1]],
-                                                        d = 25, type = "circle")
+mov_wind_list <- lapply(ndsms_rcl_list, FUN = function(x) terra::focalMat(x, d = 25, type = "circle"))
 
-ndsm_drone_reinhardshagen_1_resampled_mov_wind <- terra::focalMat(ndsms_rcl_list[[2]],
-                                                                  d = 25, type = "circle")
+# Try (it has to be iterated over mov_wind_list for argument w)
+#ndsms_focal_mean_list <- lapply(ndsms_rcl_list_test, FUN = function(x) terra::focal(x, w = , fun = "mean", na.policy = "omit"))
 
-ndsm_aircraft_reinhardshagen_1_mov_wind <- terra::focalMat(ndsms_rcl_list[[3]],
-                                                           d = 25, type = "circle")
+# Define output path
+out_path <- "J:/output/canopy_cover/"
 
-ndsm_drone_reinhardshagen_2_mov_wind <- terra::focalMat(ndsms_rcl_list[[4]],
-                                                        d = 25, type = "circle")
+ndsm_drone_reinhardshagen_1_foc_mean <- terra::focal(ndsms_rcl_list[[1]],
+                                                     w = mov_wind_list[[1]],
+                                                     fun = "mean", na.policy = "omit",
+                                                     filename = paste0(out_path, "drone_reinhardshagen_1.tif"))
 
-ndsm_drone_reinhardshagen_2_resampled_mov_wind <- terra::focalMat(ndsms_rcl_list[[5]],
-                                                                  d = 25, type = "circle")
+ndsm_drone_reinhardshagen_1_resampled_foc_mean <- terra::focal(ndsms_rcl_list[[2]],
+                                                               w = mov_wind_list[[2]],
+                                                               fun = "mean", na.policy = "omit",
+                                                               filename = paste0(out_path, "drone_reinhardshagen_1_resampled.tif"))
 
-ndsm_aircraft_reinhardshagen_2_mov_wind <- terra::focalMat(ndsms_rcl_list[[6]],
-                                                           d = 25, type = "circle")
+ndsm_aircraft_reinhardshagen_1_foc_mean <- terra::focal(ndsms_rcl_list[[3]],
+                                                        w = mov_wind_list[[3]],
+                                                        fun = "mean", na.policy = "omit",
+                                                        filename = paste0(out_path, "aircraft_reinhardshagen_1.tif"))
 
-ndsm_drone_neukirchen8_1_mov_wind <- terra::focalMat(ndsms_rcl_list[[7]],
-                                                     d = 25, type = "circle")
+ndsm_drone_reinhardshagen_2_foc_mean <- terra::focal(ndsms_rcl_list[[4]],
+                                                     w = mov_wind_list[[4]],
+                                                     fun = "mean", na.policy = "omit",
+                                                     filename = paste0(out_path, "drone_reinhardshagen_2.tif"))
 
-ndsm_drone_neukirchen8_1_resampled_mov_wind <- terra::focalMat(ndsms_rcl_list[[8]],
-                                                               d = 25, type = "circle")
+ndsm_drone_reinhardshagen_2_resampled_foc_mean <- terra::focal(ndsms_rcl_list[[5]],
+                                                               w = mov_wind_list[[5]],
+                                                               fun = "mean", na.policy = "omit",
+                                                               filename = paste0(out_path, "drone_reinhardshagen_2_resampled.tif"))
 
-ndsm_aircraft_neukirchen8_1_mov_wind <- terra::focalMat(ndsms_rcl_list[[9]],
-                                                        d = 25, type = "circle")
+ndsm_aircraft_reinhardshagen_2_foc_mean <- terra::focal(ndsms_rcl_list[[6]],
+                                                        w = mov_wind_list[[6]],
+                                                        fun = "mean", na.policy = "omit",
+                                                        filename = paste0(out_path, "aircraft_reinhardshagen_2.tif"))
 
-ndsm_drone_neukirchen8_2_mov_wind <- terra::focalMat(ndsms_rcl_list[[10]],
-                                                     d = 25, type = "circle")
+ndsm_drone_neukirchen8_1_foc_mean <- terra::focal(ndsms_rcl_list[[7]],
+                                                  w = mov_wind_list[[7]],
+                                                  fun = "mean", na.policy = "omit",
+                                                  filename = paste0(out_path, "drone_neukirchen8_1.tif"))
 
-ndsm_drone_neukirchen8_2_resampled_mov_wind <- terra::focalMat(ndsms_rcl_list[[11]],
-                                                               d = 25, type = "circle")
+ndsm_drone_neukirchen8_1_resampled_foc_mean <- terra::focal(ndsms_rcl_list[[8]],
+                                                            w = mov_wind_list[[8]],
+                                                            fun = "mean", na.policy = "omit",
+                                                            filename = paste0(out_path, "drone_neukirchen8_1_resampled.tif"))
 
-ndsm_aircraft_neukirchen8_2_mov_wind <- terra::focalMat(ndsms_rcl_list[[12]],
-                                                        d = 25, type = "circle")
+ndsm_aircraft_neukirchen8_1_foc_mean <- terra::focal(ndsms_rcl_list[[9]],
+                                                     w = mov_wind_list[[9]],
+                                                     fun = "mean", na.policy = "omit",
+                                                     filename = paste0(out_path, "aircraft_neukirchen8_1.tif"))
 
-ndsm_drone_neukirchen9_1_mov_wind <- terra::focalMat(ndsms_rcl_list[[13]],
-                                                     d = 25, type = "circle")
+ndsm_drone_neukirchen8_2_foc_mean <- terra::focal(ndsms_rcl_list[[10]],
+                                                  w = mov_wind_list[[10]],
+                                                  fun = "mean", na.policy = "omit",
+                                                  filename = paste0(out_path, "drone_neukirchen8_2.tif"))
 
-ndsm_drone_neukirchen9_1_resampled_mov_wind <- terra::focalMat(ndsms_rcl_list[[14]],
-                                                               d = 25, type = "circle")
+ndsm_drone_neukirchen8_2_resampled_foc_mean <- terra::focal(ndsms_rcl_list[[11]],
+                                                            w = mov_wind_list[[11]],
+                                                            fun = "mean", na.policy = "omit",
+                                                            filename = paste0(out_path, "drone_neukirchen8_2_resampled.tif"))
 
-ndsm_aircraft_neukirchen9_1_mov_wind <- terra::focalMat(ndsms_rcl_list[[15]],
-                                                        d = 25, type = "circle")
+ndsm_aircraft_neukirchen8_2_foc_mean <- terra::focal(ndsms_rcl_list[[12]],
+                                                     w = mov_wind_list[[12]],
+                                                     fun = "mean", na.policy = "omit",
+                                                     filename = paste0(out_path, "aircraft_neukirchen8_2.tif"))
 
-ndsm_drone_neukirchen9_2_mov_wind <- terra::focalMat(ndsms_rcl_list[[16]],
-                                                     d = 25, type = "circle")
+ndsm_drone_neukirchen9_1_foc_mean <- terra::focal(ndsms_rcl_list[[13]],
+                                                  w = mov_wind_list[[13]],
+                                                  fun = "mean", na.policy = "omit",
+                                                  filename = paste0(out_path, "drone_neukirchen9_1.tif"))
 
-ndsm_drone_neukirchen9_2_resampled_mov_wind <- terra::focalMat(ndsms_rcl_list[[17]],
-                                                               d = 25, type = "circle")
+ndsm_drone_neukirchen9_1_resampled_foc_mean <- terra::focal(ndsms_rcl_list[[14]],
+                                                            w = mov_wind_list[[14]],
+                                                            fun = "mean", na.policy = "omit",
+                                                            filename = paste0(out_path, "drone_neukirchen9_1_resampled.tif"))
 
-ndsm_aircraft_neukirchen9_2_mov_wind <- terra::focalMat(ndsms_rcl_list[[18]],
-                                                        d = 25, type = "circle")
+ndsm_aircraft_neukirchen9_1_foc_mean <- terra::focal(ndsms_rcl_list[[15]],
+                                                     w = mov_wind_list[[15]],
+                                                     fun = "mean", na.policy = "omit",
+                                                     filename = paste0(out_path, "aircraft_neukirchen9_1.tif"))
 
-mov_wind_list <- list(ndsm_drone_reinhardshagen_1_mov_wind, ndsm_drone_reinhardshagen_1_resampled_mov_wind, ndsm_aircraft_reinhardshagen_1_mov_wind,
-                      ndsm_drone_reinhardshagen_2_mov_wind, ndsm_drone_reinhardshagen_2_resampled_mov_wind, ndsm_aircraft_reinhardshagen_2_mov_wind,
-                      ndsm_drone_neukirchen8_1_mov_wind, ndsm_drone_neukirchen8_1_resampled_mov_wind, ndsm_aircraft_neukirchen8_1_mov_wind,
-                      ndsm_drone_neukirchen8_2_mov_wind, ndsm_drone_neukirchen8_2_resampled_mov_wind, ndsm_aircraft_neukirchen8_2_mov_wind,
-                      ndsm_drone_neukirchen9_1_mov_wind, ndsm_drone_neukirchen9_1_resampled_mov_wind, ndsm_aircraft_neukirchen9_1_mov_wind,
-                      ndsm_drone_neukirchen9_2_mov_wind, ndsm_drone_neukirchen9_2_resampled_mov_wind, ndsm_aircraft_neukirchen9_2_mov_wind)
+ndsm_drone_neukirchen9_2_foc_mean <- terra::focal(ndsms_rcl_list[[16]],
+                                                  w = mov_wind_list[[16]],
+                                                  fun = "mean", na.policy = "omit",
+                                                  filename = paste0(out_path, "drone_neukirchen9_2.tif"))
 
+ndsm_drone_neukirchen9_2_resampled_foc_mean <- terra::focal(ndsms_rcl_list[[17]],
+                                                            w = mov_wind_list[[17]],
+                                                            fun = "mean", na.policy = "omit",
+                                                            filename = paste0(out_path, "drone_neukirchen9_2_resampled.tif"))
 
+ndsm_aircraft_neukirchen9_2_foc_mean <- terra::focal(ndsms_rcl_list[[18]],
+                                                     w = mov_wind_list[[18]],
+                                                     fun = "mean", na.policy = "omit",
+                                                     filename = paste0(out_path, "aircraft_neukirchen9_2.tif"))
 
-ndsm_drone_reinhardshagen_1_foc <- terra::focal(ndsms_rcl_list[[1]],
-                                                w = mov_wind_list[[1]],
-                                                fun = "mean", na.policy = "omit")
-
-ndsm_drone_reinhardshagen_1_resampled_foc <- terra::focal(ndsms_rcl_list[[2]],
-                                                          w = mov_wind_list[[2]],
-                                                          fun = "mean", na.policy = "omit")
-
-ndsm_aircraft_reinhardshagen_1_foc <- terra::focal(ndsms_rcl_list[[3]],
-                                                   w = mov_wind_list[[3]],
-                                                   fun = "mean", na.policy = "omit")
-
-ndsm_drone_reinhardshagen_2_foc <- terra::focal(ndsms_rcl_list[[4]],
-                                                w = mov_wind_list[[4]],
-                                                fun = "mean", na.policy = "omit")
-
-ndsm_drone_reinhardshagen_2_resampled_foc <- terra::focal(ndsms_rcl_list[[5]],
-                                                          w = mov_wind_list[[5]],
-                                                          fun = "mean", na.policy = "omit")
-
-ndsm_aircraft_reinhardshagen_2_foc <- terra::focal(ndsms_rcl_list[[6]],
-                                                   w = mov_wind_list[[6]],
-                                                   fun = "mean", na.policy = "omit")
-
-ndsm_drone_neukirchen8_1_foc <- terra::focal(ndsms_rcl_list[[7]],
-                                             w = mov_wind_list[[7]],
-                                             fun = "mean", na.policy = "omit")
-
-ndsm_drone_neukirchen8_1_resampled_foc <- terra::focal(ndsms_rcl_list[[8]],
-                                                       w = mov_wind_list[[8]],
-                                                       fun = "mean", na.policy = "omit")
-
-ndsm_aircraft_neukirchen8_1_foc <- terra::focal(ndsms_rcl_list[[9]],
-                                                w = mov_wind_list[[9]],
-                                                fun = "mean", na.policy = "omit")
-
-ndsm_drone_neukirchen8_2_foc <- terra::focal(ndsms_rcl_list[[10]],
-                                             w = mov_wind_list[[10]],
-                                             fun = "mean", na.policy = "omit")
-
-ndsm_drone_neukirchen8_2_resampled_foc <- terra::focal(ndsms_rcl_list[[11]],
-                                                       w = mov_wind_list[[11]],
-                                                       fun = "mean", na.policy = "omit")
-
-ndsm_aircraft_neukirchen8_2_foc <- terra::focal(ndsms_rcl_list[[12]],
-                                                w = mov_wind_list[[12]],
-                                                fun = "mean", na.policy = "omit")
-
-ndsm_drone_neukirchen9_1_foc <- terra::focal(ndsms_rcl_list[[13]],
-                                             w = mov_wind_list[[13]],
-                                             fun = "mean", na.policy = "omit")
-
-ndsm_drone_neukirchen9_1_resampled_foc <- terra::focal(ndsms_rcl_list[[14]],
-                                                       w = mov_wind_list[[14]],
-                                                       fun = "mean", na.policy = "omit")
-
-ndsm_aircraft_neukirchen9_1_foc <- terra::focal(ndsms_rcl_list[[15]],
-                                                w = mov_wind_list[[15]],
-                                                fun = "mean", na.policy = "omit")
-
-ndsm_drone_neukirchen9_2_foc <- terra::focal(ndsms_rcl_list[[16]],
-                                             w = mov_wind_list[[16]],
-                                             fun = "mean", na.policy = "omit")
-
-ndsm_drone_neukirchen9_2_resampled_foc <- terra::focal(ndsms_rcl_list[[17]],
-                                                       w = mov_wind_list[[17]],
-                                                       fun = "mean", na.policy = "omit")
-
-ndsm_aircraft_neukirchen9_2_foc <- terra::focal(ndsms_rcl_list[[18]],
-                                                w = mov_wind_list[[18]],
-                                                fun = "mean", na.policy = "omit")
+# Test plots
+par(mfrow = c(1,3))
+terra::plot(ndsm_drone_neukirchen9_2_foc_mean)
+terra::plot(ndsm_drone_neukirchen9_2_resampled_foc_mean)
+terra::plot(ndsm_aircraft_neukirchen9_2_foc_mean)
 
 
-
-
-terra::writeRaster(ndsm_drone_reinhardshagen_1_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_reinhardshagen_1_foc.tif"))
-terra::writeRaster(ndsm_drone_reinhardshagen_1_resampled_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_reinhardshagen_1_resampled_foc.tif"))
-terra::writeRaster(ndsm_aircraft_reinhardshagen_1_foc, paste0("J:/output/canopy_cover/", "ndsm_aircraft_reinhardshagen_1_foc.tif"))
-
-terra::writeRaster(ndsm_drone_reinhardshagen_2_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_reinhardshagen_2_foc.tif"))
-terra::writeRaster(ndsm_drone_reinhardshagen_2_resampled_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_reinhardshagen_2_resampled_foc.tif"))
-terra::writeRaster(ndsm_aircraft_reinhardshagen_2_foc, paste0("J:/output/canopy_cover/", "ndsm_aircraft_reinhardshagen_2_foc.tif"))
-
-terra::writeRaster(ndsm_drone_neukirchen8_1_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_neukirchen8_1_foc.tif"))
-terra::writeRaster(ndsm_drone_neukirchen8_1_resampled_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_neukirchen8_1_resampled_foc.tif"))
-terra::writeRaster(ndsm_aircraft_neukirchen8_1_foc, paste0("J:/output/canopy_cover/", "ndsm_aircraft_neukirchen8_1_foc.tif"))
-
-terra::writeRaster(ndsm_drone_neukirchen8_2_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_neukirchen8_2_foc.tif"))
-terra::writeRaster(ndsm_drone_neukirchen8_2_resampled_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_neukirchen8_2_resampled_foc.tif"))
-terra::writeRaster(ndsm_aircraft_neukirchen8_2_foc, paste0("J:/output/canopy_cover/", "ndsm_aircraft_neukirchen8_2_foc.tif"))
-
-terra::writeRaster(ndsm_drone_neukirchen9_1_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_neukirchen9_1_foc.tif"))
-terra::writeRaster(ndsm_drone_neukirchen9_1_resampled_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_neukirchen9_1_resampled_foc.tif"))
-terra::writeRaster(ndsm_aircraft_neukirchen9_1_foc, paste0("J:/output/canopy_cover/", "ndsm_aircraft_neukirchen9_1_foc.tif"))
-
-terra::writeRaster(ndsm_drone_neukirchen9_2_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_neukirchen9_2_foc.tif"))
-terra::writeRaster(ndsm_drone_neukirchen9_2_resampled_foc, paste0("J:/output/canopy_cover/", "ndsm_drone_neukirchen9_2_resampled_foc.tif"))
-terra::writeRaster(ndsm_aircraft_neukirchen9_2_foc, paste0("J:/output/canopy_cover/", "ndsm_aircraft_neukirchen9_2_foc.tif"))
-
-
-
-##############
 
 # Derive areas of open and dense forest
 #--------------------------------------
@@ -236,10 +178,32 @@ matr <- c(0, 0.6, 0,
 
 rclmatr <- matrix(matr, ncol = 3, byrow = TRUE)
 
-canopy_cover_list <- list(ndsm_drone_reinhardshagen_1_resampled_foc, ndsm_aircraft_reinhardshagen_1_foc)
+canopy_cover_list <- list(ndsm_drone_reinhardshagen_1_foc_mean, ndsm_drone_reinhardshagen_1_resampled_foc_mean, ndsm_aircraft_reinhardshagen_1_foc_mean,
+                          ndsm_drone_reinhardshagen_2_foc_mean, ndsm_drone_reinhardshagen_2_resampled_foc_mean, ndsm_aircraft_reinhardshagen_2_foc_mean,
+                          ndsm_drone_neukirchen8_1_foc_mean, ndsm_drone_neukirchen8_1_resampled_foc_mean, ndsm_aircraft_neukirchen8_1_foc_mean,
+                          ndsm_drone_neukirchen8_2_foc_mean, ndsm_drone_neukirchen8_2_resampled_foc_mean, ndsm_aircraft_neukirchen8_2_foc_mean,
+                          ndsm_drone_neukirchen9_1_foc_mean, ndsm_drone_neukirchen9_1_resampled_foc_mean, ndsm_aircraft_neukirchen9_1_foc_mean,
+                          ndsm_drone_neukirchen9_2_foc_mean, ndsm_drone_neukirchen9_2_resampled_foc_mean, ndsm_aircraft_neukirchen9_2_foc_mean)
 
 canopy_cover_rcl_list <- lapply(canopy_cover_list, FUN = function(x) terra::classify(x, rclmatr, right = FALSE))
 
+# Define output path
+out_path <- "J:/output/forest_type/"
+
+for (i in seq(canopy_cover_rcl_list)){
+
+  terra::writeRaster(canopy_cover_rcl_list[[i]],
+                     filename = paste0(out_path, substr(terra::sources(canopy_cover_list[[i]]), 24, nchar(terra::sources(canopy_cover_list[[i]])))))
+  
+}
+
+# Test plots
+par(mfrow = c(1,3))
+terra::plot(canopy_cover_rcl_list[[16]])
+terra::plot(canopy_cover_rcl_list[[17]])
+terra::plot(canopy_cover_rcl_list[[18]])
+
+### This workflow doesn't work
 # Group regions:
 # adjacent pixels with same values in a neighborhood of 8 cells are identified  
 patches <- terra::patches(canopy_cover_rcl_list[[1]], directions = 8,
@@ -255,9 +219,19 @@ par(mfrow = c(1,3))
 terra::plot(patches)
 terra::plot(test)
 terra::plot(canopy_cover_rcl_list[[1]])
-
 ###
-# Test gap detection
+
+
+
+# Gap detection
+#--------------------------------------
+# Reclassify maps of open and dense forest:
+# all pixels with value 0 get value 1,
+# all pixels with value 1 get value 3,
+# then, subtract the reclassified nDSMs from step 1
+# from the new reclassified open and dense forest maps
+# to add all pixels with heights < 3 m to the classified dense forest
+
 matr <- c(0, 1,
           1, 3)
 
@@ -265,31 +239,72 @@ rclmatr <- matrix(matr, ncol = 2, byrow = TRUE)
 
 canopy_cover_rcl_new_list <- lapply(canopy_cover_rcl_list, FUN = function(x) terra::classify(x, rclmatr))
 
-map_four_classes <- canopy_cover_rcl_new_list[[2]] - ndsms_rcl_list[[3]]
+map_four_classes_list <- mapply('-', canopy_cover_rcl_new_list, ndsms_rcl_list, SIMPLIFY = FALSE)
 
-matr <- c(0, 0,
-          1, 0,
-          2, 1,
-          3, 2)
+# combine classes 0 (open forest) and 1 (gaps into open forest)
+# into one class = open forest
+# result: map with three classes:
+# 1 (open forest), 2 (dense forest), 3 (gaps into dense forest)
+
+matr <- c(0, 1,
+          1, 1,
+          2, 2,
+          3, 3)
 
 rclmatr <- matrix(matr, ncol = 2, byrow = TRUE)
 
-map_four_classes_rcl <- terra::classify(map_four_classes, rclmatr)
+map_three_classes_list <- lapply(map_four_classes_list, FUN = function(x) terra::classify(x, rclmatr))
 
+# Define output path
+out_path <- "J:/output/forest_type_with_gaps/"
+
+for (i in seq(map_three_classes_list)){
+  
+  terra::writeRaster(map_three_classes_list[[i]],
+                     filename = paste0(out_path, substr(terra::sources(canopy_cover_list[[i]]), 24, nchar(terra::sources(canopy_cover_list[[i]])))))
+  
+}
+
+### This workflow doesn't work
 patches <- terra::patches(map_four_classes_rcl, directions = 8,
                           zeroAsNA = TRUE, allowGaps = FALSE)
 
 rz <- terra::zonal(terra::cellSize(patches, unit = "m"), patches, fun = "sum", as.raster = TRUE)
 s <- terra::ifel(rz < 10, NA, patches)
+###
+
+# Test plot
+par(mfrow = c(1,3))
+terra::plot(map_three_classes_list[[1]])
+terra::plot(map_three_classes_list[[2]])
+terra::plot(map_three_classes_list[[3]])
+
+# Test plot
+par(mfrow = c(1,2))
+#colors <- c("palegoldenrod", "palegreen4", "palegreen2")
+colors <- c("burlywood", "forestgreen", "palegreen2")
+terra::plot(map_three_classes_list[[1]], legend = FALSE,
+            col = colors, main = "Drohne")
+legend("topright", legend = c("offener Bestand", "geschlossener Bestand", "Lücke"), fill = colors, border = FALSE, bty = "n")
+terra::plot(map_three_classes_list[[3]], legend = FALSE,
+            col = colors, main = "Flugzeug")
+legend("topright", legend = c("offener Bestand", "geschlossener Bestand", "Lücke"), fill = colors, border = FALSE, bty = "n")
+
+
+### This plotting method doesn't work yet
+levels(map_three_classes_list[[1]]) <- c("offen", "geschlossen", "luecke")
+levels(map_three_classes_list[[1]])
+###
+
 
 # Testing with package "ForestGapR"
 library(ForestGapR)
 
-raster_drone <- raster::raster(ndsms_list[[2]])
+raster_drone <- raster::raster(ndsms_list[[1]])
 raster_aircraft <- raster::raster(ndsms_list[[3]])
 
-gaps_drone <- getForestGaps(raster_drone, threshold = 3, size = c(10, 20^4))
-gaps_aircraft <- getForestGaps(raster_aircraft, threshold = 3, size = c(10, 20^4))
+gaps_drone <- getForestGaps(raster_drone, threshold = 3, size = c(10, 10^4))
+gaps_aircraft <- getForestGaps(raster_aircraft, threshold = 3, size = c(10, 10^4))
 
 par_org <- par()
 par(mfrow = c(1,2))
@@ -299,58 +314,3 @@ raster::plot(raster_aircraft, col = viridis::viridis(10))
 raster::plot(gaps_aircraft, col = "red", add = TRUE, legend = FALSE)
 
 gaps_stat_drone <- GapStats(gaps_drone, raster_drone)
-
-###
-
-
-par_org <- par()
-par(mfrow = c(1,2))
-terra::plot(s)
-terra::plot(test)
-par(par_org)
-
-
-par_org <- par()
-par(mfrow = c(1,2))
-terra::plot(patches, col = grDevices::hcl.colors(10, palette = "Set2"))
-terra::plot(canopy_cover_rcl_list[[2]])
-
-
-par_org <- par()
-par(mfow = c(1,2))
-terra::plot(s)
-terra::plot(canopy_cover_rcl_list[[1]])
-par(par_org)
-
-
-par_org <- par()
-par(mfrow = c(1,3))
-terra::plot(ndsm_drone_reinhardshagen_1_rcl)
-terra::plot(ndsm_drone_reinhardshagen_1_resampled_rcl)
-terra::plot(ndsm_aircraft_reinhardshagen_1_rcl)
-par(par_org)
-
-
-
-par(mfrow = c(1,2))
-terra::plot(canopy_cover_rcl_list[[1]])
-terra::plot(canopy_cover_rcl_list[[2]])
-
-
-
-par_org <- par()
-par(mfrow = c(1,2))
-#terra::plot(ndsm_drone_reinhardshagen_1_foc)
-terra::plot(ndsm_drone_reinhardshagen_1_resampled_foc)
-terra::plot(ndsm_aircraft_reinhardshagen_1_foc)
-par(par_org)
-
-par(mfrow = c(1,1))
-terra::plot(test)
-
-
-
-
-
-
-
