@@ -182,34 +182,3 @@ ndsm_aircraft_neukirchen9_1 <- terra::mask(ndsm_aircraft_neukirchen9_1_subset,
 
 ndsm_aircraft_neukirchen9_2 <- terra::mask(ndsm_aircraft_neukirchen9_2_subset,
                                            ndsm_drone_neukirchen9_2_resampled)
-
-names(ndsm_aircraft_reinhardshagen_1) <- "ndsm_aircraft_reinhardshagen_1"
-names(ndsm_aircraft_reinhardshagen_2) <- "ndsm_aircraft_reinhardshagen_2"
-names(ndsm_aircraft_neukirchen8_1) <- "ndsm_aircraft_neukirchen8_1"
-names(ndsm_aircraft_neukirchen8_2) <- "ndsm_aircraft_neukirchen8_2"
-names(ndsm_aircraft_neukirchen9_1) <- "ndsm_aircraft_neukirchen9_1"
-names(ndsm_aircraft_neukirchen9_2) <- "ndsm_aircraft_neukirchen9_2"
-
-ndsms_aircraft_list <- list(ndsm_aircraft_reinhardshagen_1, ndsm_aircraft_reinhardshagen_2,
-                            ndsm_aircraft_neukirchen8_1, ndsm_aircraft_neukirchen8_2,
-                            ndsm_aircraft_neukirchen9_1, ndsm_aircraft_neukirchen9_2)
-
-out_path <- "J:/output/tree_heights/"
-
-for (file in seq(ndsms_aircraft_list)){
-    
-  terra::writeRaster(ndsms_aircraft_list[[file]],
-                     filename = paste0(out_path,
-                                       substr(names(ndsms_aircraft_list[[file]]), 6, nchar(names(ndsms_aircraft_list[[file]]))), ".tif"),
-                     overwrite = TRUE)
-  
-}
-    
-    
-    
-    
-    
-    
-    
-    
-    

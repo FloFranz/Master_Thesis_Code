@@ -12,6 +12,7 @@
 #---------------
 library(terra)
 library(raster)
+library(lidR)
 
 
 
@@ -90,6 +91,33 @@ par_org <- par()
 terra::plot(ndsm_aircraft_neukirchen8_1)
 par(par_org)
 
+
+
+# Write to disk
+#---------------
+# Define ouput path
+out_path <- "J:/output/tree_heights/"
+
+
+ndsms_list <- list(ndsm_aircraft_reinhardshagen_1, ndsm_aircraft_reinhardshagen_2,
+                   ndsm_aircraft_neukirchen8_1, ndsm_aircraft_neukirchen8_2,
+                   ndsm_aircraft_neukirchen9_1, ndsm_aircraft_neukirchen9_2,
+                   ndsm_drone_reinhardshagen_1, ndsm_drone_reinhardshagen_2,
+                   ndsm_drone_neukirchen8_1, ndsm_drone_neukirchen8_2,
+                   ndsm_drone_neukirchen9_1, ndsm_drone_neukirchen9_2,
+                   ndsm_drone_reinhardshagen_1_resampled, ndsm_drone_reinhardshagen_2_resampled,
+                   ndsm_drone_neukirchen8_1_resampled, ndsm_drone_neukirchen8_2_resampled,
+                   ndsm_drone_neukirchen9_1_resampled, ndsm_drone_neukirchen9_2_resampled)
+
+for (file in seq(ndsms_list)){
+    
+  terra::writeRaster(ndsms_list[[file]],
+                     filename = paste0(out_path, 
+                                       substr(names(ndsms_list[[file]]), 6,
+                                              nchar(names(ndsms_list[[file]]))), ".tif"),
+                     overwrite = TRUE)
+  
+}
 
 
 # Basic statistics
@@ -173,4 +201,52 @@ terra::plot(ndsm_aircraft_neukirchen9_1)
 terra::plot(diff_neukirchen9_2, col = grDevices::hcl.colors(50, palette = "blue-red 3"))
 terra::plot(ndsm_drone_neukirchen9_2_resampled)
 terra::plot(ndsm_aircraft_neukirchen9_2)
+
+
+
+# Comparing aircraft and drone nDSMs (tree heights)
+# with LiDAR derived CHMs
+#---------------------------------------------------
+# Read data
+file_path_ndsms <- "J:/output/tree_heights/"
+file_path_chms <- "J:/output/lidar_CHMs/"
+
+ndsms_aircraft_drone_files <- list.files(file_path_ndsms,
+                                         pattern = glob2rx("*.tif"),
+                                         full.names = TRUE)
+
+chm_lidar_files <- list.files(file_path_chms,
+                              pattern = glob2rx("*.tif"),
+                              full.names = TRUE)
+
+# Read all aircraft, drone (raw and resampled) and LiDAR files into one list
+chm_lidar_files_list <- lapply(chm_lidar_files, FUN = function(x, i) terra::rast(x[i]))
+
+ndsms_aircraft_drone_files_list <- lapply(ndsms_aircraft_drone_files, FUN = function(x, i) terra::rast(x[i]))
+
+ndsms_aircraft_files <- ndsms_aircraft_drone_files_list[c(1:6)]
+
+ndsms_drone_files <- ndsms_aircraft_drone_files_list[c(7:18)]
+
+
+
+
+par_org <- par()
+par(mfrow = c(1,4))
+terra::plot(chm_lidar_files_list[[5]])
+terra::plot(ndsms_drone_files[[9]])
+terra::plot(ndsms_drone_files[[10]])
+terra::plot(ndsms_aircraft_files[[5]])
+par(par_org)
+
+
+
+
+
+
+
+
+
+
+
 
