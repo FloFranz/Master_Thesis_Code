@@ -169,6 +169,16 @@ chm_neukirchen9_1_subset <- terra::crop(chm_neukirchen9_merged,
 chm_neukirchen9_2_subset <- terra::crop(chm_neukirchen9_merged,
                                         ndsms_aircraft_list[[4]])
 
+# Replace negative values by zero in CHMs
+chm_reinhardshagen_1_subset[chm_reinhardshagen_1_subset < 0] <- 0
+chm_reinhardshagen_2_subset[chm_reinhardshagen_2_subset < 0] <- 0
+
+chm_neukirchen8_1_subset[chm_neukirchen8_1_subset < 0] <- 0
+chm_neukirchen8_2_subset[chm_neukirchen8_2_subset < 0] <- 0
+
+chm_neukirchen9_1_subset[chm_neukirchen9_1_subset < 0] <- 0
+chm_neukirchen9_2_subset[chm_neukirchen9_2_subset < 0] <- 0
+
 # Mask out the CHMs based on NA values in the aircraft nDSMs
 
 out_path <- "J:/output/lidar_CHMs/"
@@ -203,22 +213,12 @@ chm_neukirchen9_2 <- terra::mask(chm_neukirchen9_2_subset,
                                  filename = paste0(out_path, "neukirchen9_2.tif"),
                                  overwrite = TRUE)
 
-# Replace negative values by zero in CHMs
-chm_reinhardshagen_1[chm_reinhardshagen_1 < 0] <- 0
-chm_reinhardshagen_2[chm_reinhardshagen_2 < 0] <- 0
-
-chm_neukirchen8_1[chm_neukirchen8_1 < 0] <- 0
-chm_neukirchen8_2[chm_neukirchen8_2 < 0] <- 0
-
-chm_neukirchen9_1[chm_neukirchen9_1 < 0] <- 0
-chm_neukirchen9_2[chm_neukirchen9_2 < 0] <- 0
-
 
 # Plots
 par_org <- par()
 par(mfrow = c(1,2))
-terra::plot(ndsms_aircraft_list[[5]])
-lidR::plot(chm_reinhardshagen_1)
+terra::plot(ndsms_aircraft_list[[1]])
+lidR::plot(chm_neukirchen8_1)
 par(par_org)
 
 

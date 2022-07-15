@@ -224,24 +224,45 @@ chm_lidar_files_list <- lapply(chm_lidar_files, FUN = function(x, i) terra::rast
 
 ndsms_aircraft_drone_files_list <- lapply(ndsms_aircraft_drone_files, FUN = function(x, i) terra::rast(x[i]))
 
-ndsms_aircraft_files <- ndsms_aircraft_drone_files_list[c(1:6)]
+ndsms_aircraft_files_list <- ndsms_aircraft_drone_files_list[c(1:6)]
 
-ndsms_drone_files <- ndsms_aircraft_drone_files_list[c(7:18)]
+ndsms_drone_files_list <- ndsms_aircraft_drone_files_list[c(7,9,11,13,15,17)]
+
+ndsms_drone_resampled_files_list <- ndsms_aircraft_drone_files_list[c(8,10,12,14,16,18)]
 
 
+# Plots
+par_org <- par()
+par(mfrow = c(1,4))
+terra::plot(chm_lidar_files_list[[4]])              # LiDAR CHM
+terra::plot(ndsms_drone_files_list[[4]])            # Drone
+terra::plot(ndsms_drone_resampled_files_list[[4]])  # Drone resampled
+terra::plot(ndsms_aircraft_files_list[[4]])         # Aircraft
+par(par_org)
+
+# Calculate differences
+diff_lidar_aircraft <- mapply('-', chm_lidar_files_list, ndsms_aircraft_files_list,
+                              SIMPLIFY = FALSE)
+
+diff_lidar_drone <- mapply('-', chm_lidar_files_list, ndsms_drone_resampled_files_list,
+                           SIMPLIFY = FALSE)
 
 
 par_org <- par()
-par(mfrow = c(1,4))
-terra::plot(chm_lidar_files_list[[5]])
-terra::plot(ndsms_drone_files[[9]])
-terra::plot(ndsms_drone_files[[10]])
-terra::plot(ndsms_aircraft_files[[5]])
+par(mfrow = c(2,3))
+terra::plot(chm_lidar_files_list[[1]],
+            main = "CHM LiDAR")
+terra::plot(ndsms_drone_resampled_files_list[[1]],
+            main = "nDSM Drohne")
+terra::plot(ndsms_aircraft_files_list[[1]],
+            main = "nDSM Flugzeug")
+terra::plot(diff_lidar_drone[[1]],
+            col = grDevices::hcl.colors(50, palette = "blue-red 3"),
+            main = "Differenz LiDAR - Drohne")
+terra::plot(diff_lidar_aircraft[[1]],
+            col = grDevices::hcl.colors(50, palette = "blue-red 3"),
+            main = "Differenz LiDAR - Flugzeug")
 par(par_org)
-
-
-
-
 
 
 
