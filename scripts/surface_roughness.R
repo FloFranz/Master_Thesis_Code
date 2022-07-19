@@ -4,7 +4,7 @@
 # Description:  script calculates surface roughness for three different locations:
 #               Reinhardshagen, Neukirchen_8 and Neukirchen_9,
 #               two metrics are calculated: standard deviation and
-#               percentile
+#               percentile difference between the 5 % and 95 % percentile
 #               workflow is similar to the method used in the 'F3 project'
 #               (by FVA and NW-FVA) to derive forest structural parameters
 #               (https://www.waldwissen.net/de/technik-und-planung/waldinventur/ableitung-von-kronendachrauigkeit)
@@ -16,7 +16,6 @@
 #---------------
 library(terra)
 library(raster)
-library(parallel)
 
 
 
@@ -29,7 +28,7 @@ library(parallel)
 DSM = TRUE
 nDSM = FALSE
 
-# Source script for nDSM import and preprocessing
+# Source script for DSM import and preprocessing
 source("J:/scripts/src/process_DSMs.R", local = TRUE)
 
 
@@ -64,6 +63,31 @@ dsms_list <- list(dsm_drone_reinhardshagen_1_resampled, dsm_aircraft_reinhardsha
 focal_sd_list <- lapply(dsms_list, 
                         FUN = function(x) terra::focal(x, w = 41, fun = "sd",
                                                        na.policy = "omit"))
+
+# Write to disk
+# Define output path
+out_path <- "J:/output/surface_roughness_sd/"
+
+names(focal_sd_list[[1]]) <- "drone_resampled_reinhardshagen_1.tif"
+names(focal_sd_list[[2]]) <- "aircraft_reinhardshagen_1.tif"
+names(focal_sd_list[[3]]) <- "drone_resampled_reinhardshagen_2.tif"
+names(focal_sd_list[[4]]) <- "aircraft_reinhardshagen_2.tif"
+names(focal_sd_list[[5]]) <- "drone_resampled_neukirchen8_1.tif"
+names(focal_sd_list[[6]]) <- "aircraft_neukirchen8_1.tif"
+names(focal_sd_list[[7]]) <- "drone_resampled_neukirchen8_2.tif"
+names(focal_sd_list[[8]]) <- "aircraft_neukirchen8_2.tif"
+names(focal_sd_list[[9]]) <- "drone_resampled_neukirchen9_1.tif"
+names(focal_sd_list[[10]]) <- "aircraft_neukirchen9_1.tif"
+names(focal_sd_list[[11]]) <- "drone_resampled_neukirchen9_2.tif"
+names(focal_sd_list[[12]]) <- "aircraft_neukirchen9_2.tif"
+
+for (i in seq(focal_sd_list)){
+  
+  terra::writeRaster(focal_sd_list[[i]],
+                     filename = paste0(out_path, substr(focal_sd_list[[i]]@ptr[["names"]], 1,
+                                                        nchar(focal_sd_list[[i]]@ptr[["names"]]))))
+  
+}
 
 # Test plots
 par_org <- par()
@@ -137,7 +161,8 @@ names(p_diff_list[[12]]) <- "aircraft_neukirchen9_2.tif"
 for (i in seq(p_diff_list)){
   
   terra::writeRaster(p_diff_list[[i]],
-                     filename = paste0(out_path, substr(p_diff_list[[i]]@ptr[["names"]], 1, nchar(p_diff_list[[i]]@ptr[["names"]]))))
+                     filename = paste0(out_path, substr(p_diff_list[[i]]@ptr[["names"]], 1,
+                                                        nchar(p_diff_list[[i]]@ptr[["names"]]))))
   
 }
 

@@ -158,12 +158,53 @@ ndsm_aircraft_neukirchen9_2_foc_mean <- terra::focal(ndsms_rcl_list[[18]],
                                                      fun = "mean", na.policy = "omit",
                                                      filename = paste0(out_path, "aircraft_neukirchen9_2.tif"))
 
-# Test plots
-par(mfrow = c(1,3))
-terra::plot(ndsm_drone_neukirchen9_2_foc_mean)
-terra::plot(ndsm_drone_neukirchen9_2_resampled_foc_mean)
-terra::plot(ndsm_aircraft_neukirchen9_2_foc_mean)
+# Load data
+file_path_canopy_cover <- "J:/output/canopy_cover/"
 
+canopy_cover_files <- list.files(file_path_canopy_cover,
+                                 pattern = glob2rx("*.tif"),
+                                 full.names = TRUE)
+
+canopy_cover_files_list <- lapply(canopy_cover_files, FUN = function(x, i) terra::rast(x[i]))
+
+canopy_cover_aircraft <- canopy_cover_files_list[c(1:6)]
+
+canopy_cover_drone <- canopy_cover_files_list[c(7,9,11,13,15,17)]
+
+canopy_cover_drone_resampled <- canopy_cover_files_list[c(8,10,12,14,16,18)]
+
+# Calculate mean
+canopy_cover_means_aircraft <- lapply(canopy_cover_aircraft,
+                                      function(x) mean(values(x, na.rm = TRUE)))
+
+canopy_cover_means_drone <- lapply(canopy_cover_drone,
+                                   function(x) mean(values(x, na.rm = TRUE)))
+
+canopy_cover_means_aircraft_df <- do.call(rbind, canopy_cover_means_aircraft)
+
+canopy_cover_means_drone_df <- do.call(rbind, canopy_cover_means_drone)
+
+rownames(canopy_cover_means_aircraft_df) <- c("Neukirchen8_1", "Neukirchen8_2",
+                                              "Neukirchen9_1", "Neukirchen9_2",
+                                              "Reinhardshagen_1", "Reinhardshagen_2")
+
+rownames(canopy_cover_means_drone_df) <- c("Neukirchen8_1", "Neukirchen8_2",
+                                           "Neukirchen9_1", "Neukirchen9_2",
+                                           "Reinhardshagen_1", "Reinhardshagen_2")
+
+canopy_cover_means_df <- data.frame(cbind(canopy_cover_means_drone_df,
+                                          canopy_cover_means_aircraft_df))
+
+colnames(canopy_cover_means_df) <- c("Überschirmung Drohne", "Überschirmung Flugzeug")
+
+# Test plots
+par(mfrow = c(1,2))
+terra::plot(canopy_cover_drone[[6]],
+            col = grDevices::hcl.colors(50, palette = "Greens", rev = TRUE))
+#terra::plot(canopy_cover_drone_resampled[[1]],
+#            col = grDevices::hcl.colors(50, palette = "Greens", rev = TRUE))
+terra::plot(canopy_cover_aircraft[[6]],
+            col = grDevices::hcl.colors(50, palette = "Greens", rev = TRUE))
 
 
 # Derive areas of open and dense forest
@@ -273,22 +314,40 @@ rz <- terra::zonal(terra::cellSize(patches, unit = "m"), patches, fun = "sum", a
 s <- terra::ifel(rz < 10, NA, patches)
 ###
 
+# Load data
+file_path_forest_type_with_gaps <- "J:/output/forest_type_with_gaps/"
+
+forest_type_with_gaps_files <- list.files(file_path_forest_type_with_gaps,
+                                          pattern = glob2rx("*.tif"),
+                                          full.names = TRUE)
+
+forest_type_with_gaps_files_list <- lapply(forest_type_with_gaps_files,
+                                           FUN = function(x, i) terra::rast(x[i]))
+
+forest_type_with_gaps_aircraft <- forest_type_with_gaps_files_list[c(1:6)]
+
+forest_type_with_gaps_drone <- forest_type_with_gaps_files_list[c(7,9,11,13,15,17)]
+
+forest_type_with_gaps_drone_resampled <- forest_type_with_gaps_files_list[c(8,10,12,14,16,18)]
+
 # Test plot
-par(mfrow = c(1,3))
-terra::plot(map_three_classes_list[[1]])
-terra::plot(map_three_classes_list[[2]])
-terra::plot(map_three_classes_list[[3]])
+par(mfrow = c(1,2))
+terra::plot(forest_type_with_gaps_drone[[1]])
+#terra::plot(forest_type_with_gaps_drone_resampled[[1]])
+terra::plot(forest_type_with_gaps_aircraft[[1]])
 
 # Test plot
 par(mfrow = c(1,2))
 #colors <- c("palegoldenrod", "palegreen4", "palegreen2")
 colors <- c("burlywood", "forestgreen", "palegreen2")
-terra::plot(map_three_classes_list[[1]], legend = FALSE,
+terra::plot(forest_type_with_gaps_drone[[5]], legend = FALSE,
             col = colors, main = "Drohne")
-legend("topright", legend = c("offener Bestand", "geschlossener Bestand", "Lücke"), fill = colors, border = FALSE, bty = "n")
-terra::plot(map_three_classes_list[[3]], legend = FALSE,
+legend("topright", legend = c("offener Bestand", "geschlossener Bestand", "Lücke"),
+       fill = colors, border = FALSE, bty = "n")
+terra::plot(forest_type_with_gaps_aircraft[[5]], legend = FALSE,
             col = colors, main = "Flugzeug")
-legend("topright", legend = c("offener Bestand", "geschlossener Bestand", "Lücke"), fill = colors, border = FALSE, bty = "n")
+legend("topright", legend = c("offener Bestand", "geschlossener Bestand", "Lücke"),
+       fill = colors, border = FALSE, bty = "n")
 
 
 ### This plotting method doesn't work yet
