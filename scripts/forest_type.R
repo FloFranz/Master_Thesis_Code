@@ -199,11 +199,11 @@ colnames(canopy_cover_means_df) <- c("Überschirmung Drohne", "Überschirmung Flug
 
 # Test plots
 par(mfrow = c(1,2))
-terra::plot(canopy_cover_drone[[6]],
+terra::plot(canopy_cover_drone[[5]],
             col = grDevices::hcl.colors(50, palette = "Greens", rev = TRUE))
 #terra::plot(canopy_cover_drone_resampled[[1]],
 #            col = grDevices::hcl.colors(50, palette = "Greens", rev = TRUE))
-terra::plot(canopy_cover_aircraft[[6]],
+terra::plot(canopy_cover_aircraft[[5]],
             col = grDevices::hcl.colors(50, palette = "Greens", rev = TRUE))
 
 
@@ -332,9 +332,9 @@ forest_type_with_gaps_drone_resampled <- forest_type_with_gaps_files_list[c(8,10
 
 # Test plot
 par(mfrow = c(1,2))
-terra::plot(forest_type_with_gaps_drone[[1]])
+terra::plot(forest_type_with_gaps_drone[[5]])
 #terra::plot(forest_type_with_gaps_drone_resampled[[1]])
-terra::plot(forest_type_with_gaps_aircraft[[1]])
+terra::plot(forest_type_with_gaps_aircraft[[5]])
 
 # Test plot
 par(mfrow = c(1,2))

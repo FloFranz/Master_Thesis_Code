@@ -223,22 +223,6 @@ par(par_org)
 
 
 
-diff <- chm_neukirchen9_1 - ndsm_aircraft9_1
-
-par(mfrow = c(1,1))
-terra::plot(diff)
-
-
-
-
-
-
-
-
-
-
-
-
 ################################################
 # Remains for single read in
 las <- lidR::readLAS(las_files[79])
