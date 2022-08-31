@@ -204,11 +204,3 @@ dsm_aircraft_neukirchen9_1 <- terra::mask(dsm_aircraft_neukirchen9_1_subset,
 
 dsm_aircraft_neukirchen9_2 <- terra::mask(dsm_aircraft_neukirchen9_2_subset,
                                           dsm_drone_neukirchen9_2_resampled)
-
-
-
-
-#par(mfrow = c(1,3))
-#terra::plot(dsm_aircraft_neukirchen9_2, col=c(blue.col(50), terrain.colors(50)))
-#terra::plot(dsm_drone_neukirchen9_2)
-#terra::plot(dsm_drone_neukirchen9_2_resampled)
