@@ -43,7 +43,8 @@ matr <- c(0, 3, 0,
 
 rclmatr <- matrix(matr, ncol = 3, byrow = TRUE)
 
-# Improved workflow (focal part yet not fully implemented)
+# Calculate focal mean:
+# Circular moving window with radius = 25 m
 ndsms_list <- list(ndsm_drone_reinhardshagen_1, ndsm_drone_reinhardshagen_1_resampled, ndsm_aircraft_reinhardshagen_1,
                    ndsm_drone_reinhardshagen_2, ndsm_drone_reinhardshagen_2_resampled, ndsm_aircraft_reinhardshagen_2,
                    ndsm_drone_neukirchen8_1, ndsm_drone_neukirchen8_1_resampled, ndsm_aircraft_neukirchen8_1,
@@ -54,13 +55,12 @@ ndsms_list <- list(ndsm_drone_reinhardshagen_1, ndsm_drone_reinhardshagen_1_resa
 
 ndsms_rcl_list <- lapply(ndsms_list, FUN = function(x) terra::classify(x, rclmatr, right = FALSE))
 
-# Calculate focal mean:
-# Circular moving window with radius = 25 m
+mov_wind_list <- lapply(ndsms_rcl_list, FUN = function(x) terra::focalMat(x, d = 25, type = "circle"))
+
 
 # For testing with a smaller list
 #ndsms_rcl_list_test <- ndsms_rcl_list[c(17,18)]
 
-mov_wind_list <- lapply(ndsms_rcl_list, FUN = function(x) terra::focalMat(x, d = 25, type = "circle"))
 
 # Try (it has to be iterated over mov_wind_list for argument w)
 #ndsms_focal_mean_list <- lapply(ndsms_rcl_list_test, FUN = function(x) terra::focal(x, w = , fun = "mean", na.policy = "omit"))
@@ -170,8 +170,6 @@ canopy_cover_files_list <- lapply(canopy_cover_files, FUN = function(x, i) terra
 canopy_cover_aircraft <- canopy_cover_files_list[c(1:6)]
 
 canopy_cover_drone <- canopy_cover_files_list[c(7,9,11,13,15,17)]
-
-canopy_cover_drone_resampled <- canopy_cover_files_list[c(8,10,12,14,16,18)]
 
 # Calculate mean
 canopy_cover_means_aircraft <- lapply(canopy_cover_aircraft,
@@ -328,7 +326,6 @@ forest_type_with_gaps_aircraft <- forest_type_with_gaps_files_list[c(1:6)]
 
 forest_type_with_gaps_drone <- forest_type_with_gaps_files_list[c(7,9,11,13,15,17)]
 
-forest_type_with_gaps_drone_resampled <- forest_type_with_gaps_files_list[c(8,10,12,14,16,18)]
 
 # Test plot
 par(mfrow = c(1,2))
