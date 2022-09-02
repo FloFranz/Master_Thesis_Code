@@ -11,7 +11,6 @@
 # Load packages
 #---------------
 library(terra)
-library(raster)
 library(lidR)
 
 
@@ -19,7 +18,7 @@ library(lidR)
 # Read las files
 #----------------
 # Define file path
-file_path <- "K:/ALS-NW-FVA/"
+file_path <- "N:/ALS-NW-FVA/"
 
 las_files <- list.files(file_path,
                         pattern = glob2rx("*.las"),
@@ -50,6 +49,10 @@ for (i in seq(las_files_list)){
 # Check individual las files
 lidR::las_check(las_files_list[[1]])
 
+
+### LÖSCHEN!!!###
+### Wird nur benötigt, wenn Reinhardshagen prozessiert werden soll ###
+### könnte dann so auch mit dem Verweis drin bleiben ###
 # Filter point-cloud of location Reinhardshagen,
 # there are some outliers in the Z-dimension
 
@@ -93,7 +96,7 @@ ggplot(las_tr@data, aes(X,Z, color = Z)) +
   coord_equal() + 
   theme_minimal() +
   scale_color_gradientn(colours = height.colors(50))
-
+#############################################################################
 
 
 
@@ -118,7 +121,7 @@ chm_list <- lapply(norm_las_list,
                                                                 max_edge = c(0, 1.5))))
 
 # Test plots
-lidR::plot(chm_list[[9]], col = lidR::height.colors(50))
+lidR::plot(chm_list[[1]], col = lidR::height.colors(50))
 
 # Merge tiles into one
 chm_reinhardshagen_merged <- terra::merge(chm_list[[7]],
@@ -135,7 +138,7 @@ chm_neukirchen9_merged <- terra::merge(chm_list[[1]],
                                        chm_list[[2]])
 
 # Test plots
-lidR::plot(chm_reinhardshagen_merged, col = lidR::height.colors(50))
+lidR::plot(chm_neukirchen9_merged, col = lidR::height.colors(50))
 
 # Crop out subsets of the merged LiDAR CHMs
 # corresponding to the extent of the respective aircraft and drone nDSMs,
@@ -180,7 +183,6 @@ chm_neukirchen9_1_subset[chm_neukirchen9_1_subset < 0] <- 0
 chm_neukirchen9_2_subset[chm_neukirchen9_2_subset < 0] <- 0
 
 # Mask out the CHMs based on NA values in the aircraft nDSMs
-
 out_path <- "J:/output/lidar_CHMs/"
 
 chm_reinhardshagen_1 <- terra::mask(chm_reinhardshagen_1_subset,
@@ -220,78 +222,3 @@ par(mfrow = c(1,2))
 terra::plot(ndsms_aircraft_list[[1]])
 lidR::plot(chm_neukirchen8_1)
 par(par_org)
-
-
-
-################################################
-# Remains for single read in
-las <- lidR::readLAS(las_files[79])
-las_right <- lidR::readLAS(las_files[28])
-
-epsg_number <- 25832
-
-crs(las) <- epsg_number
-
-lidR::las_check(las)
-
-las
-
-lidR::plot(las, size = 3)
-
-#####
-# Trying to solve the problem with location Reinhardshagen
-gnd <- filter_ground(las)
-plot(gnd, size = 3, bg = "white", color = "Classification")
-
-las_filter <- lidR::filter_poi(las, Z >= 53, Z <= 400)
-
-
-
-test <- lidR::filter_duplicates(las)
-plot(test, size = 3, bg = "white", color = "Classification")
-######
-
-# Height normalization within the point cloud
-norm_las <- lidR::normalize_height(las_filter, lidR::knnidw())
-
-# Check if all ground points are 0
-hist(filter_ground(norm_las)$Z, breaks = seq(-0.45, 0.45, 0.01), main = "", xlab = "Elevation")
-
-
-dsm <- lidR::rasterize_canopy(las_filter, res = 0.5,
-                              algorithm = pitfree(thresholds = c(0, 10, 20), max_edge = c(0, 1.5)))
-
-dsm
-
-lidR::plot(dsm, col = lidR::height.colors(50))
-
-# Calculate CHM
-chm <- lidR::rasterize_canopy(norm_las, res = 0.5,
-                              algorithm = pitfree(thresholds = c(0, 10, 20), max_edge = c(0, 1.5)))
-
-chm <- lidR::rasterize_canopy(norm_las, res = 0.5,
-                              algorithm = p2r(0.2, na.fill = tin()))
-
-chm <- lidR::rasterize_canopy(norm_las, res = 0.5,
-                              algorithm = dsmtin(max_edge = 8))
-
-chm
-
-chm_subset <- terra::crop(chm, ndsms_aircraft_list[[6]])
-
-lidR::plot(chm, col = lidR::height.colors(50))
-
-lidR::plot(chm_subset, col = lidR::height.colors(50))
-################################################
-
-
-
-
-
-
-
-
-
-
-
-
