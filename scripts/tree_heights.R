@@ -152,10 +152,10 @@ ndsms_drone_resampled_files_list <- ndsms_aircraft_drone_files_list[c(8,10,12,14
 # Plots
 par_org <- par()
 par(mfrow = c(1,3))
-terra::plot(chm_lidar_files_list[[2]])              # LiDAR CHM
-terra::plot(ndsms_drone_files_list[[2]])            # Drone
+terra::plot(chm_lidar_files_list[[4]])              # LiDAR CHM
+terra::plot(ndsms_drone_files_list[[4]])            # Drone
 #terra::plot(ndsms_drone_resampled_files_list[[1]]) # Drone resampled
-terra::plot(ndsms_aircraft_files_list[[2]])         # Aircraft
+terra::plot(ndsms_aircraft_files_list[[4]])         # Aircraft
 par(par_org)
 
 
@@ -169,10 +169,10 @@ list_maxs_aircraft <- c()
 for (i in ndsms_aircraft_files_list){
   
   list_means_aircraft <- append(list_means_aircraft,
-                                terra::global(i, fun = "mean", na.rm = TRUE))
+                                round(terra::global(i, fun = "mean", na.rm = TRUE), 1))
   
   list_maxs_aircraft <- append(list_maxs_aircraft,
-                               terra::global(i, fun = "max", na.rm = TRUE))
+                               round(terra::global(i, fun = "max", na.rm = TRUE), 1))
   
 }
 
@@ -183,10 +183,10 @@ list_maxs_drone <- c()
 for (i in ndsms_drone_files_list){
   
   list_means_drone <- append(list_means_drone,
-                             terra::global(i, fun = "mean", na.rm = TRUE))
+                             round(terra::global(i, fun = "mean", na.rm = TRUE), 1))
   
   list_maxs_drone <- append(list_maxs_drone,
-                               terra::global(i, fun = "max", na.rm = TRUE))
+                            round(terra::global(i, fun = "max", na.rm = TRUE), 1))
   
 }
 
@@ -197,10 +197,10 @@ list_maxs_lidar <- c()
 for (i in chm_lidar_files_list){
   
   list_means_lidar <- append(list_means_lidar,
-                             terra::global(i, fun = "mean", na.rm = TRUE))
+                             round(terra::global(i, fun = "mean", na.rm = TRUE), 1))
   
   list_maxs_lidar <- append(list_maxs_lidar,
-                            terra::global(i, fun = "max", na.rm = TRUE))
+                            round(terra::global(i, fun = "max", na.rm = TRUE), 1))
   
 }
 
@@ -283,14 +283,14 @@ me_lidar_aircraft <-  mapply(function(x, y) mean(x - y),
                              SIMPLIFY = FALSE)
 
 me_mean_lidar_aircraft <- lapply(me_lidar_aircraft,
-                                 function(x) mean(values(x, na.rm = TRUE)))
+                                 function(x) round(mean(values(x, na.rm = TRUE)), 2))
 
 me_lidar_drone <-  mapply(function(x, y) mean(x - y),
                           ndsms_drone_resampled_files_list, chm_lidar_files_list,
                           SIMPLIFY = FALSE)
 
 me_mean_lidar_drone <- lapply(me_lidar_drone,
-                              function(x) mean(values(x, na.rm = TRUE)))
+                              function(x) round(mean(values(x, na.rm = TRUE)), 2))
 
 
 me_mean_lidar_aircraft_df <- do.call(rbind, me_mean_lidar_aircraft)
@@ -312,16 +312,16 @@ colnames(me_means_df) <- c("ME LiDAR Drohne", "ME LiDAR Flugzeug")
 # Plots of ME
 par_org <- par()
 par(mfrow = c(2,3))
-terra::plot(chm_lidar_files_list[[1]],
+terra::plot(chm_lidar_files_list[[3]],
             main = "CHM LiDAR")
-terra::plot(ndsms_drone_resampled_files_list[[1]],
+terra::plot(ndsms_drone_resampled_files_list[[3]],
             main = "nDSM Drohne")
-terra::plot(ndsms_aircraft_files_list[[1]],
+terra::plot(ndsms_aircraft_files_list[[3]],
             main = "nDSM Flugzeug")
-terra::plot(me_lidar_drone[[1]],
+terra::plot(me_lidar_drone[[3]],
             col = grDevices::hcl.colors(50, palette = "blue-red 3"),
             main = "Mean Error LiDAR - Drohne")
-terra::plot(me_lidar_aircraft[[1]],
+terra::plot(me_lidar_aircraft[[3]],
             col = grDevices::hcl.colors(50, palette = "blue-red 3"),
             main = "Mean Error LiDAR - Flugzeug")
 par(par_org)
@@ -333,7 +333,7 @@ rmse_lidar_aircraft <- mapply(function(x, y) sqrt(mean((x - y)^2)),
                               SIMPLIFY = FALSE)
 
 rmse_mean_lidar_aircraft <- lapply(rmse_lidar_aircraft,
-                                   function(x) mean(values(x, na.rm = TRUE)))
+                                   function(x) round(mean(values(x, na.rm = TRUE)), 2))
 
 
 rmse_lidar_drone <- mapply(function(x, y) sqrt(mean((x - y)^2)),
@@ -341,7 +341,7 @@ rmse_lidar_drone <- mapply(function(x, y) sqrt(mean((x - y)^2)),
                            SIMPLIFY = FALSE)
 
 rmse_mean_lidar_drone <- lapply(rmse_lidar_drone,
-                                function(x) mean(values(x, na.rm = TRUE)))
+                                function(x) round(mean(values(x, na.rm = TRUE)), 2))
 
 # Create data frame with RMSE results
 rmse_mean_lidar_aircraft_df <- do.call(rbind, rmse_mean_lidar_aircraft)
@@ -364,16 +364,16 @@ colnames(rmse_means_df) <- c("RMSE LiDAR Drohne", "RMSE LiDAR Flugzeug")
 # Plots of RMSE
 par_org <- par()
 par(mfrow = c(2,3))
-terra::plot(chm_lidar_files_list[[4]],
+terra::plot(chm_lidar_files_list[[3]],
             main = "CHM LiDAR")
-terra::plot(ndsms_drone_resampled_files_list[[4]],
+terra::plot(ndsms_drone_resampled_files_list[[3]],
             main = "nDSM Drohne")
-terra::plot(ndsms_aircraft_files_list[[4]],
+terra::plot(ndsms_aircraft_files_list[[3]],
             main = "nDSM Flugzeug")
-terra::plot(rmse_lidar_drone[[4]],
+terra::plot(rmse_lidar_drone[[3]],
             col = grDevices::hcl.colors(50, palette = "RdYlBu", rev = TRUE),
             main = "RMSE LiDAR - Drohne")
-terra::plot(rmse_lidar_aircraft[[4]],
+terra::plot(rmse_lidar_aircraft[[3]],
             col = grDevices::hcl.colors(50, palette = "RdYlBu", rev = TRUE),
             main = "RMSE LiDAR - Flugzeug")
 par(par_org)
