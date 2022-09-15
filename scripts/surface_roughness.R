@@ -29,7 +29,7 @@ DSM = TRUE
 nDSM = FALSE
 
 # Source script for DSM import and preprocessing
-source("J:/scripts/src/process_DSMs.R", local = TRUE)
+source("D:/scripts/src/process_DSMs.R", local = TRUE)
 
 
 
@@ -42,6 +42,52 @@ terra::plot(dsm_drone_reinhardshagen_1)
 terra::plot(dsm_drone_reinhardshagen_1_resampled)
 terra::plot(dsm_aircraft_reinhardshagen_1)
 par(par_org)
+
+
+
+# Write to disk
+#---------------
+# Define output path
+out_path <- "D:/output/dsm_heights/"
+
+# Rename DSMs
+names(dsm_aircraft_reinhardshagen_1)  <- "aircraft_reinhardshagen_1"
+names(dsm_aircraft_reinhardshagen_2)  <- "aircraft_reinhardshagen_2"
+names(dsm_aircraft_neukirchen8_1)     <- "aircraft_neukirchen8_1"
+names(dsm_aircraft_neukirchen8_2)     <- "aircraft_neukirchen8_2"
+names(dsm_aircraft_neukirchen9_1)     <- "aircraft_neukirchen9_1"
+names(dsm_aircraft_neukirchen9_2)     <- "aircraft_neukirchen9_2"
+
+names(dsm_drone_reinhardshagen_1)  <- "drone_reinhardshagen_1"
+names(dsm_drone_reinhardshagen_2)  <- "drone_reinhardshagen_2"
+names(dsm_drone_neukirchen8_1)     <- "drone_neukirchen8_1"
+names(dsm_drone_neukirchen8_2)     <- "drone_neukirchen8_2"
+names(dsm_drone_neukirchen9_1)     <- "drone_neukirchen9_1"
+names(dsm_drone_neukirchen9_2)     <- "drone_neukirchen9_2"
+
+dsms_list <- list(dsm_aircraft_reinhardshagen_1, dsm_aircraft_reinhardshagen_2,
+                  dsm_aircraft_neukirchen8_1, dsm_aircraft_neukirchen8_2,
+                  dsm_aircraft_neukirchen9_1, dsm_aircraft_neukirchen9_2,
+                  dsm_drone_reinhardshagen_1, dsm_drone_reinhardshagen_2,
+                  dsm_drone_neukirchen8_1, dsm_drone_neukirchen8_2,
+                  dsm_drone_neukirchen9_1, dsm_drone_neukirchen9_2)
+
+# Change CRS of drone DSMs to ETRS89 / UTM zone 32N (EPSG:25832)
+for (drone_dsm in 7:length(dsms_list)){
+  
+  terra::crs(dsms_list[[drone_dsm]]) <- "epsg:25832"
+  
+}
+
+for (file in seq(dsms_list)){
+  
+  terra::writeRaster(dsms_list[[file]],
+                     filename = paste0(out_path, 
+                                       substr(names(dsms_list[[file]]), 1,
+                                              nchar(names(dsms_list[[file]]))), ".tif"),
+                     overwrite = TRUE)
+  
+}
 
 
 
@@ -95,10 +141,10 @@ focal_sd_aircraft_list <- focal_sd_list[c(2,4,6,8,10,12)]
 focal_sd_drone_list <- focal_sd_list[c(1,3,5,7,9,11)]
 
 sd_means_aircraft <- lapply(focal_sd_aircraft_list,
-                            function(x) mean(values(x, na.rm = TRUE)))
+                            function(x) round(mean(values(x, na.rm = TRUE)), 2))
 
 sd_means_drone <- lapply(focal_sd_drone_list,
-                         function(x) mean(values(x, na.rm = TRUE)))
+                         function(x) round(mean(values(x, na.rm = TRUE)), 2))
 
 sd_means_aircraft_df <- do.call(rbind, sd_means_aircraft)
 
@@ -119,8 +165,8 @@ colnames(sd_means_df) <- c("SD Drohne", "SD Flugzeug")
 # Test plots
 par_org <- par()
 par(mfrow = c(1,2))
-terra::plot(focal_sd_list[[11]], col = viridis::viridis(50))
-terra::plot(focal_sd_list[[12]], col = viridis::viridis(50))
+terra::plot(focal_sd_list[[1]], col = viridis::viridis(50))
+terra::plot(focal_sd_list[[2]], col = viridis::viridis(50))
 par(par_org)
 
 
@@ -247,13 +293,13 @@ par(mfrow = c(3,2))
 terra::plot(dsms_list[[1]], main = "DSM Drohne")
 terra::plot(dsms_list[[2]], main = "DSM Flugzeug")
 terra::plot(focal_sd_list[[1]], col = viridis::viridis(50),
-            main = "Standardabweichung der Höhe - Drohne")
+            main = "Standardabweichung der H?he - Drohne")
 terra::plot(focal_sd_list[[2]], col = viridis::viridis(50),
-            main = "Standardabweichung der Höhe - Flugzeug")
+            main = "Standardabweichung der H?he - Flugzeug")
 terra::plot(p_diff_drone[[5]], col = grDevices::hcl.colors(50, "Zissou 1"),
-            main = "Perzentilabstand der Höhe - Drohne")
+            main = "Perzentilabstand der H?he - Drohne")
 terra::plot(p_diff_aircraft[[5]], col = grDevices::hcl.colors(50, "Zissou 1"),
-            main = "Perzentilabstand der Höhe - Flugzeug")
+            main = "Perzentilabstand der H?he - Flugzeug")
 par(par_org)
 
 

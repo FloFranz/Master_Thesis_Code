@@ -9,7 +9,7 @@
 #-------------------------------------------------------------------------------
 
 # Define root directory
-root_dir <- "J:/data/"
+root_dir <- "D:/data/"
 
 # Define platform
 aircraft <- "aircraft/"

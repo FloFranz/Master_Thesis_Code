@@ -13,8 +13,6 @@
 # Load packages
 #---------------
 library(terra)
-library(raster)
-library(lidR)
 
 
 
@@ -127,8 +125,8 @@ for (file in seq(ndsms_list)){
 # with LiDAR derived CHMs
 #---------------------------------------------------
 # Read data
-file_path_ndsms <- "J:/output/tree_heights/"
-file_path_chms <- "J:/output/lidar_CHMs/"
+file_path_ndsms <- "D:/output/tree_heights/"
+file_path_chms <- "D:/output/lidar_CHMs/"
 
 ndsms_aircraft_drone_files <- list.files(file_path_ndsms,
                                          pattern = glob2rx("*.tif"),
@@ -309,6 +307,43 @@ me_means_df <- data.frame(cbind(me_mean_lidar_drone_df, me_mean_lidar_aircraft_d
 
 colnames(me_means_df) <- c("ME LiDAR Drohne", "ME LiDAR Flugzeug")
 
+# Write to disk
+out_path <- "D:/output/tree_heights_me/"
+
+names(me_lidar_aircraft[[1]]) <- "aircraft_neukirchen8_1"
+names(me_lidar_aircraft[[2]]) <- "aircraft_neukirchen8_2"
+names(me_lidar_aircraft[[3]]) <- "aircraft_neukirchen9_1"
+names(me_lidar_aircraft[[4]]) <- "aircraft_neukirchen9_2"
+names(me_lidar_aircraft[[5]]) <- "aircraft_reinhardshagen_1"
+names(me_lidar_aircraft[[6]]) <- "aircraft_reinhardshagen_2"
+
+for (file in seq(me_lidar_aircraft)){
+  
+  terra::writeRaster(me_lidar_aircraft[[file]],
+                     filename = paste0(out_path, 
+                                       substr(names(me_lidar_aircraft[[file]]), 1,
+                                              nchar(names(me_lidar_aircraft[[file]]))), ".tif"),
+                     overwrite = TRUE)
+  
+}
+
+names(me_lidar_drone[[1]]) <- "drone_neukirchen8_1"
+names(me_lidar_drone[[2]]) <- "drone_neukirchen8_2"
+names(me_lidar_drone[[3]]) <- "drone_neukirchen9_1"
+names(me_lidar_drone[[4]]) <- "drone_neukirchen9_2"
+names(me_lidar_drone[[5]]) <- "drone_reinhardshagen_1"
+names(me_lidar_drone[[6]]) <- "drone_reinhardshagen_2"
+
+for (file in seq(me_lidar_drone)){
+  
+  terra::writeRaster(me_lidar_drone[[file]],
+                     filename = paste0(out_path, 
+                                       substr(names(me_lidar_drone[[file]]), 1,
+                                              nchar(names(me_lidar_drone[[file]]))), ".tif"),
+                     overwrite = TRUE)
+  
+}
+
 # Plots of ME
 par_org <- par()
 par(mfrow = c(2,3))
@@ -335,7 +370,6 @@ rmse_lidar_aircraft <- mapply(function(x, y) sqrt(mean((x - y)^2)),
 rmse_mean_lidar_aircraft <- lapply(rmse_lidar_aircraft,
                                    function(x) round(mean(values(x, na.rm = TRUE)), 2))
 
-
 rmse_lidar_drone <- mapply(function(x, y) sqrt(mean((x - y)^2)),
                            ndsms_drone_resampled_files_list, chm_lidar_files_list,
                            SIMPLIFY = FALSE)
@@ -360,6 +394,43 @@ rownames(rmse_mean_lidar_drone_df) <- c("Neukirchen8_1", "Neukirchen8_2",
 rmse_means_df <- data.frame(cbind(rmse_mean_lidar_drone_df, rmse_mean_lidar_aircraft_df))
 
 colnames(rmse_means_df) <- c("RMSE LiDAR Drohne", "RMSE LiDAR Flugzeug")
+
+# Write to disk
+out_path <- "D:/output/tree_heights_rmse/"
+
+names(rmse_lidar_aircraft[[1]]) <- "aircraft_neukirchen8_1"
+names(rmse_lidar_aircraft[[2]]) <- "aircraft_neukirchen8_2"
+names(rmse_lidar_aircraft[[3]]) <- "aircraft_neukirchen9_1"
+names(rmse_lidar_aircraft[[4]]) <- "aircraft_neukirchen9_2"
+names(rmse_lidar_aircraft[[5]]) <- "aircraft_reinhardshagen_1"
+names(rmse_lidar_aircraft[[6]]) <- "aircraft_reinhardshagen_2"
+
+for (file in seq(rmse_lidar_aircraft)){
+  
+  terra::writeRaster(rmse_lidar_aircraft[[file]],
+                     filename = paste0(out_path, 
+                                       substr(names(rmse_lidar_aircraft[[file]]), 1,
+                                              nchar(names(rmse_lidar_aircraft[[file]]))), ".tif"),
+                     overwrite = TRUE)
+  
+}
+
+names(rmse_lidar_drone[[1]]) <- "drone_neukirchen8_1"
+names(rmse_lidar_drone[[2]]) <- "drone_neukirchen8_2"
+names(rmse_lidar_drone[[3]]) <- "drone_neukirchen9_1"
+names(rmse_lidar_drone[[4]]) <- "drone_neukirchen9_2"
+names(rmse_lidar_drone[[5]]) <- "drone_reinhardshagen_1"
+names(rmse_lidar_drone[[6]]) <- "drone_reinhardshagen_2"
+
+for (file in seq(rmse_lidar_drone)){
+  
+  terra::writeRaster(rmse_lidar_drone[[file]],
+                     filename = paste0(out_path, 
+                                       substr(names(rmse_lidar_drone[[file]]), 1,
+                                              nchar(names(rmse_lidar_drone[[file]]))), ".tif"),
+                     overwrite = TRUE)
+  
+}
 
 # Plots of RMSE
 par_org <- par()

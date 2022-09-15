@@ -23,7 +23,7 @@ library(raster)
 # Data import
 #-------------
 # Source script for filepath definitions
-source("J:/scripts/src/set_filepaths.R", local = TRUE)
+source("D:/scripts/src/set_filepaths.R", local = TRUE)
 
 # Aircraft #
 dsm_reinhardshagen_tile1 <- terra::rast(paste0(filepath_reinhardshagen_dsm_aircraft,
