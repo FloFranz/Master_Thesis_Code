@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
 # Name:         process_nDSMs.R
 # Author:       Florian Franz
-# Description:  script prepares nDSMs from platform aircraft and drone
+# Description:  script prepares nDSMs from platforms aircraft and drone
 #               for further derivation of forest structural parameters,
 #               steps: 
 #               1) merging aircraft tiles at one location into one

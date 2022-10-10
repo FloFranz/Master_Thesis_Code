@@ -2,9 +2,10 @@
 # Name:         tree_heights.R
 # Author:       Florian Franz
 # Description:  script derives tree heights using nDSMs from three different locations:
-#               Reinhardshagen, Neukirchen_8 and Neukirchen_9
-#               basic statistics and difference between aircraft and drone nDSMs are calculated
-#               aircraft and drone nDSMs are further compared with LiDAR dervid CHMs
+#               Reinhardshagen, Neukirchen_8 and Neukirchen_9,
+#               basic statistics and difference between aircraft and drone nDSMs are calculated,
+#               aircraft and drone nDSMs are further compared with LiDAR dervid CHMs and
+#               mean error (ME) and root-mean-square error (RMSE) are calculated
 # Data          nDSM tif files from platforms 
 #               aircraft (0.5 m resolution) and drone (0.1 m resolution),
 #               LiDAR derived CHM tif files (0.5 m resolution) 
@@ -125,8 +126,8 @@ for (file in seq(ndsms_list)){
 # with LiDAR derived CHMs
 #---------------------------------------------------
 # Read data
-file_path_ndsms <- "D:/output/tree_heights/"
-file_path_chms <- "D:/output/lidar_CHMs/"
+file_path_ndsms <- "J:/output/tree_heights/"
+file_path_chms <- "J:/output/lidar_CHMs/"
 
 ndsms_aircraft_drone_files <- list.files(file_path_ndsms,
                                          pattern = glob2rx("*.tif"),
@@ -152,7 +153,6 @@ par_org <- par()
 par(mfrow = c(1,3))
 terra::plot(chm_lidar_files_list[[4]])              # LiDAR CHM
 terra::plot(ndsms_drone_files_list[[4]])            # Drone
-#terra::plot(ndsms_drone_resampled_files_list[[1]]) # Drone resampled
 terra::plot(ndsms_aircraft_files_list[[4]])         # Aircraft
 par(par_org)
 
@@ -308,7 +308,7 @@ me_means_df <- data.frame(cbind(me_mean_lidar_drone_df, me_mean_lidar_aircraft_d
 colnames(me_means_df) <- c("ME LiDAR Drohne", "ME LiDAR Flugzeug")
 
 # Write to disk
-out_path <- "D:/output/tree_heights_me/"
+out_path <- "J:/output/tree_heights_me/"
 
 names(me_lidar_aircraft[[1]]) <- "aircraft_neukirchen8_1"
 names(me_lidar_aircraft[[2]]) <- "aircraft_neukirchen8_2"
@@ -396,7 +396,7 @@ rmse_means_df <- data.frame(cbind(rmse_mean_lidar_drone_df, rmse_mean_lidar_airc
 colnames(rmse_means_df) <- c("RMSE LiDAR Drohne", "RMSE LiDAR Flugzeug")
 
 # Write to disk
-out_path <- "D:/output/tree_heights_rmse/"
+out_path <- "J:/output/tree_heights_rmse/"
 
 names(rmse_lidar_aircraft[[1]]) <- "aircraft_neukirchen8_1"
 names(rmse_lidar_aircraft[[2]]) <- "aircraft_neukirchen8_2"

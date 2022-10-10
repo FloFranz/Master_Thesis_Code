@@ -50,9 +50,10 @@ for (i in seq(las_files_list)){
 lidR::las_check(las_files_list[[1]])
 
 
-### LÖSCHEN!!!###
-### Wird nur benötigt, wenn Reinhardshagen prozessiert werden soll ###
-### könnte dann so auch mit dem Verweis drin bleiben ###
+
+# This part is only required if location Reinhardshagen should be processed,
+# which is not done here.
+#
 # Filter point-cloud of location Reinhardshagen,
 # there are some outliers in the Z-dimension
 
@@ -84,19 +85,6 @@ las_files_list[[9]] <- lidR::filter_poi(las_files_list[[9]], Z >= 46, Z <= 420)
 
 min(las_files_list[[9]]@data[["Z"]])  # 271.275
 max(las_files_list[[9]]@data[["Z"]])  # 416.242
-
-
-# Cross section plot
-p1 <- c(541000, 5698000)
-p2 <- c(542000, 5699000)
-las_tr <- clip_transect(las_files_list[[7]], p1, p2, width = 4, xz = TRUE)
-
-ggplot(las_tr@data, aes(X,Z, color = Z)) + 
-  geom_point(size = 0.5) + 
-  coord_equal() + 
-  theme_minimal() +
-  scale_color_gradientn(colours = height.colors(50))
-#############################################################################
 
 
 
@@ -136,9 +124,6 @@ chm_neukirchen8_2_merged <- terra::merge(chm_list[[5]],
 
 chm_neukirchen9_merged <- terra::merge(chm_list[[1]],
                                        chm_list[[2]])
-
-# Test plots
-lidR::plot(chm_neukirchen9_merged, col = lidR::height.colors(50))
 
 # Crop out subsets of the merged LiDAR CHMs
 # corresponding to the extent of the respective aircraft and drone nDSMs,
@@ -214,7 +199,6 @@ chm_neukirchen9_2 <- terra::mask(chm_neukirchen9_2_subset,
                                  ndsms_aircraft_list[[4]],
                                  filename = paste0(out_path, "neukirchen9_2.tif"),
                                  overwrite = TRUE)
-
 
 # Plots
 par_org <- par()

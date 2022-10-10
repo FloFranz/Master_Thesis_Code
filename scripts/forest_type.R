@@ -14,7 +14,6 @@
 # Load packages
 #---------------
 library(terra)
-library(raster)
 
 
 
@@ -56,14 +55,6 @@ ndsms_list <- list(ndsm_drone_reinhardshagen_1, ndsm_drone_reinhardshagen_1_resa
 ndsms_rcl_list <- lapply(ndsms_list, FUN = function(x) terra::classify(x, rclmatr, right = FALSE))
 
 mov_wind_list <- lapply(ndsms_rcl_list, FUN = function(x) terra::focalMat(x, d = 25, type = "circle"))
-
-
-# For testing with a smaller list
-#ndsms_rcl_list_test <- ndsms_rcl_list[c(17,18)]
-
-
-# Try (it has to be iterated over mov_wind_list for argument w)
-#ndsms_focal_mean_list <- lapply(ndsms_rcl_list_test, FUN = function(x) terra::focal(x, w = , fun = "mean", na.policy = "omit"))
 
 # Define output path
 out_path <- "J:/output/canopy_cover/"
@@ -159,7 +150,7 @@ ndsm_aircraft_neukirchen9_2_foc_mean <- terra::focal(ndsms_rcl_list[[18]],
                                                      filename = paste0(out_path, "aircraft_neukirchen9_2.tif"))
 
 # Load data
-file_path_canopy_cover <- "D:/output/canopy_cover/"
+file_path_canopy_cover <- "J:/output/canopy_cover/"
 
 canopy_cover_files <- list.files(file_path_canopy_cover,
                                  pattern = glob2rx("*.tif"),
@@ -193,7 +184,7 @@ rownames(canopy_cover_means_drone_df) <- c("Neukirchen8_1", "Neukirchen8_2",
 canopy_cover_means_df <- data.frame(cbind(canopy_cover_means_drone_df,
                                           canopy_cover_means_aircraft_df))
 
-colnames(canopy_cover_means_df) <- c("Ãœberschirmung Drohne", "Ãœberschirmung Flugzeug")
+colnames(canopy_cover_means_df) <- c("Überschirmung Drohne", "Überschirmung Flugzeug")
 
 # Test plots
 par(mfrow = c(1,2))
@@ -201,6 +192,7 @@ terra::plot(canopy_cover_drone[[5]],
             col = grDevices::hcl.colors(50, palette = "Greens", rev = TRUE))
 terra::plot(canopy_cover_aircraft[[5]],
             col = grDevices::hcl.colors(50, palette = "Greens", rev = TRUE))
+
 
 
 # Derive areas of open and dense forest
@@ -230,7 +222,8 @@ out_path <- "J:/output/forest_type/"
 for (i in seq(canopy_cover_rcl_list)){
 
   terra::writeRaster(canopy_cover_rcl_list[[i]],
-                     filename = paste0(out_path, substr(terra::sources(canopy_cover_list[[i]]), 24, nchar(terra::sources(canopy_cover_list[[i]])))))
+                     filename = paste0(out_path, substr(terra::sources(canopy_cover_list[[i]]),
+                                                        24, nchar(terra::sources(canopy_cover_list[[i]])))))
   
 }
 
@@ -239,24 +232,6 @@ par(mfrow = c(1,3))
 terra::plot(canopy_cover_rcl_list[[16]])
 terra::plot(canopy_cover_rcl_list[[17]])
 terra::plot(canopy_cover_rcl_list[[18]])
-
-### This workflow doesn't work
-# Group regions:
-# adjacent pixels with same values in a neighborhood of 8 cells are identified  
-patches <- terra::patches(canopy_cover_rcl_list[[1]], directions = 8,
-                          zeroAsNA = TRUE, allowGaps = FALSE)
-
-# Remove small patches (patches < 0.5 ha)
-rz <- terra::zonal(terra::cellSize(patches, unit = "ha"), patches, fun = "sum", as.raster = TRUE)
-s <- terra::ifel(rz < 0.5, NA, patches)
-
-test <- terra::ifel(s >=1, 1, terra::ifel(is.na(s), 0, s))
-
-par(mfrow = c(1,3))
-terra::plot(patches)
-terra::plot(test)
-terra::plot(canopy_cover_rcl_list[[1]])
-###
 
 
 
@@ -298,20 +273,13 @@ out_path <- "J:/output/forest_type_with_gaps/"
 for (i in seq(map_three_classes_list)){
   
   terra::writeRaster(map_three_classes_list[[i]],
-                     filename = paste0(out_path, substr(terra::sources(canopy_cover_list[[i]]), 24, nchar(terra::sources(canopy_cover_list[[i]])))))
+                     filename = paste0(out_path, substr(terra::sources(canopy_cover_list[[i]]),
+                                                        24, nchar(terra::sources(canopy_cover_list[[i]])))))
   
 }
 
-### This workflow doesn't work
-patches <- terra::patches(map_four_classes_rcl, directions = 8,
-                          zeroAsNA = TRUE, allowGaps = FALSE)
-
-rz <- terra::zonal(terra::cellSize(patches, unit = "m"), patches, fun = "sum", as.raster = TRUE)
-s <- terra::ifel(rz < 10, NA, patches)
-###
-
 # Load data
-file_path_forest_type_with_gaps <- "D:/output/forest_type_with_gaps/"
+file_path_forest_type_with_gaps <- "J:/output/forest_type_with_gaps/"
 
 forest_type_with_gaps_files <- list.files(file_path_forest_type_with_gaps,
                                           pattern = glob2rx("*.tif"),
@@ -323,13 +291,6 @@ forest_type_with_gaps_files_list <- lapply(forest_type_with_gaps_files,
 forest_type_with_gaps_aircraft <- forest_type_with_gaps_files_list[c(1:6)]
 
 forest_type_with_gaps_drone <- forest_type_with_gaps_files_list[c(7,9,11,13,15,17)]
-
-
-# Test plot
-par(mfrow = c(1,2))
-terra::plot(forest_type_with_gaps_drone[[5]])
-#terra::plot(forest_type_with_gaps_drone_resampled[[1]])
-terra::plot(forest_type_with_gaps_aircraft[[5]])
 
 # Test plot
 par(mfrow = c(1,2))
@@ -343,28 +304,3 @@ terra::plot(forest_type_with_gaps_aircraft[[5]], legend = FALSE,
             col = colors, main = "Flugzeug")
 legend("topright", legend = c("offener Bestand", "geschlossener Bestand", "LÃ¼cke"),
        fill = colors, border = FALSE, bty = "n")
-
-
-### This plotting method doesn't work yet
-levels(map_three_classes_list[[1]]) <- c("offen", "geschlossen", "luecke")
-levels(map_three_classes_list[[1]])
-###
-
-
-# Testing with package "ForestGapR"
-library(ForestGapR)
-
-raster_drone <- raster::raster(ndsms_list[[1]])
-raster_aircraft <- raster::raster(ndsms_list[[3]])
-
-gaps_drone <- getForestGaps(raster_drone, threshold = 3, size = c(10, 10^4))
-gaps_aircraft <- getForestGaps(raster_aircraft, threshold = 3, size = c(10, 10^4))
-
-par_org <- par()
-par(mfrow = c(1,2))
-raster::plot(raster_drone, col = viridis::viridis(10))
-raster::plot(gaps_drone, col = "red", add = TRUE, legend = FALSE)
-raster::plot(raster_aircraft, col = viridis::viridis(10))
-raster::plot(gaps_aircraft, col = "red", add = TRUE, legend = FALSE)
-
-gaps_stat_drone <- GapStats(gaps_drone, raster_drone)
